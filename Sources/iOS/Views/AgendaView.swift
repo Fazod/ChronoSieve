@@ -168,6 +168,25 @@ struct AgendaView: View {
 
     private var bottomControlBar: some View {
         HStack {
+            // Today button – left side
+            Button {
+                goToToday()
+            } label: {
+                VStack(spacing: 0) {
+                    Text(todayWeekdayLabel)
+                        .font(.system(size: 9, weight: .bold))
+                        .textCase(.uppercase)
+                        .foregroundStyle(.red)
+                    Text(todayDayLabel)
+                        .font(.system(size: 20, weight: .light, design: .rounded))
+                        .foregroundStyle(.primary)
+                }
+                .frame(width: 56, height: 56)
+                .glassEffect(.regular.interactive(), in: Circle())
+            }
+            .tint(.primary)
+            .accessibilityLabel("Go to today")
+
             Spacer()
 
             Menu {
@@ -247,6 +266,23 @@ struct AgendaView: View {
         .padding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 12)
+    }
+
+    private func goToToday() {
+        let today = Calendar.current.startOfDay(for: Date())
+        selectedDate = today
+        if viewMode == .calendar {
+            pendingScrollDate = today
+        }
+        // Day view responds via its own onChange(of: selectedDate)
+    }
+
+    private var todayWeekdayLabel: String {
+        Date().formatted(.dateTime.weekday(.abbreviated)).uppercased()
+    }
+
+    private var todayDayLabel: String {
+        "\(Calendar.current.component(.day, from: Date()))"
     }
 
     private var permissionDeniedView: some View {
