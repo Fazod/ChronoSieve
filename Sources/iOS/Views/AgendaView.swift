@@ -41,7 +41,7 @@ struct AgendaView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            .overlay(alignment: .bottom) {
                 bottomControlBar
             }
             .sheet(isPresented: $showingRuleManager) {
@@ -266,6 +266,8 @@ struct AgendaView: View {
         .padding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 12)
+        .background(.clear)
+        .safeAreaPadding(.bottom)
     }
 
     private func goToToday() {
