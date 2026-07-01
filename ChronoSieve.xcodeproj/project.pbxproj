@@ -10,6 +10,7 @@
 		00038FC04F3CED80307A604A /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06643D45E899BB335D56D0D9 /* CalendarSource.swift */; };
 		0C5D070F93DF8B62B4DB5BFA /* FilterRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */; };
 		0F3A901B82CAA4250CE90194 /* AgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89CAF70713B2F04DA7AA7242 /* AgendaView.swift */; };
+		1C0AC699CFBA1DAA85DFB0B9 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BD99690E8710D99FBFF96D /* DayView.swift */; };
 		2D0E85D9E0118998724ACD2F /* RuntimeEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821638FABA765E98C992F496 /* RuntimeEnvironment.swift */; };
 		323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06643D45E899BB335D56D0D9 /* CalendarSource.swift */; };
 		36DC03D69059B2C21676C3DC /* MockCalendarFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42B4D5D2DF128083900C6DA /* MockCalendarFixtures.swift */; };
@@ -61,6 +62,7 @@
 		06643D45E899BB335D56D0D9 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
 		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaSnapshot.swift; sourceTree = "<group>"; };
+		48BD99690E8710D99FBFF96D /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
 		4DF3798727C1DA99D985DDD3 /* FilterRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRule.swift; sourceTree = "<group>"; };
 		4E1B62E00FBDF38347DC994D /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
 		5766FB0D43AF8AC7363E7820 /* ChronoSieveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveApp.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				89CAF70713B2F04DA7AA7242 /* AgendaView.swift */,
+				48BD99690E8710D99FBFF96D /* DayView.swift */,
 				FF043204E6CBF4120E385587 /* EventDetailView.swift */,
 				5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */,
 			);
@@ -405,6 +408,7 @@
 				7AFAA17CA7288953F51EAFB2 /* CalendarService.swift in Sources */,
 				323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */,
 				A8C466239400616DBE2DE4B7 /* ChronoSieveApp.swift in Sources */,
+				1C0AC699CFBA1DAA85DFB0B9 /* DayView.swift in Sources */,
 				42AB290C21B57D37A2130547 /* EventDetailView.swift in Sources */,
 				3B39D654E4E2A9266F61793B /* FilterRule.swift in Sources */,
 				83FEEFEA91807A83762CD2A4 /* FilterRuleRecord.swift in Sources */,

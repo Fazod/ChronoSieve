@@ -8,6 +8,8 @@ struct AgendaView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: [SortDescriptor(\FilterRuleRecord.createdAt)]) private var persistedRules: [FilterRuleRecord]
 
+    @AppStorage("appViewMode") private var viewModeRaw: String = AppViewMode.calendar.rawValue
+
     @State private var showingRuleManager = false
     @State private var showingHiddenEvents = false
     @State private var showingCalendarPicker = false
@@ -16,6 +18,10 @@ struct AgendaView: View {
     @State private var stickyDayHeaderHeight: CGFloat = 0
     @State private var pendingScrollDate: Date?
     @State private var isProgrammaticScroll = false
+
+    private var viewMode: AppViewMode {
+        AppViewMode(rawValue: viewModeRaw) ?? .calendar
+    }
 
     private let agendaScrollCoordinateSpace = "agenda-scroll"
 
@@ -28,6 +34,8 @@ struct AgendaView: View {
                     ScrollView(showsIndicators: false) {
                         permissionDeniedView
                     }
+                } else if viewMode == .day {
+                    DayView(viewModel: viewModel, selectedDate: $selectedDate)
                 } else {
                     agendaScrollView
                 }
@@ -58,6 +66,12 @@ struct AgendaView: View {
             }
             .onChange(of: rulesDigest) { _, _ in
                 syncRulesToViewModel()
+            }
+            .onChange(of: viewModeRaw) { _, newMode in
+                // When switching back to calendar view, scroll to the currently selected date
+                if newMode == AppViewMode.calendar.rawValue {
+                    pendingScrollDate = selectedDate
+                }
             }
         }
         .environmentObject(viewModel)
@@ -157,6 +171,29 @@ struct AgendaView: View {
             Spacer()
 
             Menu {
+                // View mode selection
+                Section("View") {
+                    Button {
+                        viewModeRaw = AppViewMode.calendar.rawValue
+                    } label: {
+                        Label(
+                            "Calendar view",
+                            systemImage: viewMode == .calendar ? "checkmark.circle.fill" : "calendar"
+                        )
+                    }
+
+                    Button {
+                        viewModeRaw = AppViewMode.day.rawValue
+                    } label: {
+                        Label(
+                            "Day view",
+                            systemImage: viewMode == .day ? "checkmark.circle.fill" : "rectangle.grid.1x2"
+                        )
+                    }
+                }
+
+                Divider()
+
                 Button {
                     Task { await viewModel.refresh(force: true) }
                 } label: {
