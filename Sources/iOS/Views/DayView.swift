@@ -180,8 +180,11 @@ struct DayTimelineView: View {
 
     // MARK: – Timeline
 
+    @State private var scrollPosition = ScrollPosition(y: 0)
+    @State private var hasInitiallyScrolled = false
+
     private var timelineSection: some View {
-        ScrollViewReader { proxy in
+        GeometryReader { geo in
             ScrollView(showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
 
@@ -197,9 +200,9 @@ struct DayTimelineView: View {
                         }
                     }
 
-                    // 2. Event blocks – needs actual width from GeometryReader
-                    GeometryReader { geo in
-                        let areaWidth = max(1, geo.size.width - timeColumnWidth)
+                    // 2. Event blocks – needs actual width from inner GeometryReader
+                    GeometryReader { inner in
+                        let areaWidth = max(1, inner.size.width - timeColumnWidth)
                         ZStack(alignment: .topLeading) {
                             ForEach(layoutEvents(timedEvents, areaWidth: areaWidth)) { layout in
                                 DayEventBlock(event: layout.event, blockHeight: layout.height)
@@ -225,20 +228,24 @@ struct DayTimelineView: View {
                 .frame(height: totalHeight)
                 .padding(.bottom, 100)
             }
+            .scrollPosition($scrollPosition)
             .onAppear {
-                let hour = max(0, scrollTargetHour - 1)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    proxy.scrollTo("hour-\(hour)", anchor: .top)
-                }
+                // Only run once – the binding then tracks the user's manual scroll.
+                guard !hasInitiallyScrolled else { return }
+                hasInitiallyScrolled = true
+                let focusY: CGFloat = isToday ? initialCurrentTimeY : CGFloat(9) * hourHeight
+                // Centre the focus line in the visible viewport.
+                let centred = focusY - geo.size.height / 2
+                scrollPosition = ScrollPosition(y: max(0, min(totalHeight + 100 - geo.size.height, centred)))
             }
         }
     }
 
-    private var scrollTargetHour: Int {
-        isToday ? Calendar.current.component(.hour, from: Date()) : 8
+    /// Y offset of the current moment at appear time (used for initial scroll only).
+    private var initialCurrentTimeY: CGFloat {
+        let mins = CGFloat(Date().timeIntervalSince(Calendar.current.startOfDay(for: date)) / 60)
+        return mins * hourHeight / 60
     }
-
-    // MARK: – Current Time Indicator
 
     private func currentTimeIndicator(at now: Date) -> some View {
         let mins = CGFloat(now.timeIntervalSince(Calendar.current.startOfDay(for: date)) / 60)
