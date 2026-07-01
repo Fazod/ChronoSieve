@@ -26,6 +26,12 @@ final class ChronoSieveUITests: XCTestCase {
     }
 
     func testCanOpenAndCloseRuleManager() {
+        let agendaButton = app.buttons["Agenda"]
+        XCTAssertTrue(agendaButton.waitForExistence(timeout: 3))
+        agendaButton.tap()
+
+        XCTAssertTrue(app.staticTexts["GES: Standup"].waitForExistence(timeout: 5))
+
         openRuleManager()
 
         let doneButton = app.buttons["Done"]

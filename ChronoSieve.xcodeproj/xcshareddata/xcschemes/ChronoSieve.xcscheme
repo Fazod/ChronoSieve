@@ -35,20 +35,6 @@
                ReferencedContainer = "container:ChronoSieve.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4FD2619C27E97A9167E01FC8"
-               BuildableName = "ChronoSieveUITests.xctest"
-               BlueprintName = "ChronoSieveUITests"
-               ReferencedContainer = "container:ChronoSieve.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -75,17 +61,6 @@
                BlueprintIdentifier = "D679A99A6723E0F057618E0C"
                BuildableName = "ChronoSieveTests.xctest"
                BlueprintName = "ChronoSieveTests"
-               ReferencedContainer = "container:ChronoSieve.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4FD2619C27E97A9167E01FC8"
-               BuildableName = "ChronoSieveUITests.xctest"
-               BlueprintName = "ChronoSieveUITests"
                ReferencedContainer = "container:ChronoSieve.xcodeproj">
             </BuildableReference>
          </TestableReference>

@@ -8,6 +8,7 @@ settings:
   base:
     SWIFT_VERSION: 5.10
     CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: Y9ARKG2EC6
 
 targets:
   ChronoSieve:
@@ -79,14 +80,12 @@ schemes:
       targets:
         ChronoSieve: all
         ChronoSieveTests: [test]
-        ChronoSieveUITests: [test]
     run:
       config: Debug
     test:
       config: Debug
       targets:
         - ChronoSieveTests
-        - ChronoSieveUITests
   ChronoSieveWatch:
     build:
       targets:

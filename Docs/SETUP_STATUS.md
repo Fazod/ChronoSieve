@@ -36,7 +36,8 @@ In Xcode:
 - ✅ Added calendar-mode day view in iOS
 - ✅ Added per-calendar on/off selection in iOS
 - ✅ Added and ran regex filter unit tests (5 passing)
-- ✅ Added and ran rudimentary UI tests for rule manager + regex validation (3 passing)
+- ✅ Added rudimentary UI tests for rule manager + regex validation (currently excluded from default test runs)
+- ✅ Added built-in mock calendar data for simulator + UI testing
 - ✅ Hardened calendar mapping for recurrence/timezone/DST edge cases
 - ✅ Optimized refresh/date-window behavior (debounced store refresh + smarter fetch cadence)
 - ✅ Verified builds:
@@ -44,4 +45,4 @@ In Xcode:
   - watchOS simulator build succeeds
 
 ## Next task
-Run end-to-end on personal iPhone + Apple Watch and expand UI coverage beyond rudimentary flows.
+Run end-to-end on personal iPhone + Apple Watch while keeping UI coverage paused from the default test loop until the app matures further.

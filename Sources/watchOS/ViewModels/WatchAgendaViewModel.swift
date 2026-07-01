@@ -49,8 +49,15 @@ final class WatchAgendaViewModel: ObservableObject {
             let data = UserDefaults.standard.data(forKey: snapshotKey),
             let snapshot = try? JSONDecoder().decode(AgendaSnapshot.self, from: data)
         else {
-            events = makePlaceholderEvents()
-            generatedAt = nil
+            if RuntimeEnvironment.usesMockCalendarData {
+                events = MockCalendarFixtures.events()
+                    .map(AgendaSnapshotEvent.init(event:))
+                    .sorted(by: { $0.startDate < $1.startDate })
+                generatedAt = nil
+            } else {
+                events = makePlaceholderEvents()
+                generatedAt = nil
+            }
             return
         }
 

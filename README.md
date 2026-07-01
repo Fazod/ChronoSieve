@@ -16,9 +16,10 @@ ChronoSieve is an iOS + watchOS calendar app prototype that reads native iOS cal
 - ✅ Hidden-events debug sheet in iOS agenda
 - ✅ Calendar on/off picker (per-calendar toggles)
 - ✅ Unit tests for regex filter engine
-- ✅ Rudimentary UI tests for rule manager flow
+- ✅ Rudimentary UI tests for rule manager flow (currently excluded from the default scheme)
 - ✅ Recurrence/timezone/DST hardening in calendar fetch pipeline
 - ✅ Debounced and optimized refresh/date-window fetching
+- ✅ Built-in mock calendar data for simulator + UI testing
 - ✅ iOS + watchOS simulator builds passing
 
 ## Generate the Xcode project
@@ -38,6 +39,9 @@ open ChronoSieve.xcodeproj
 
 ## Build notes
 - Use your free Apple ID for signing.
+- The app automatically uses built-in mock calendar data on simulators and during UI tests.
+- Pass the `REAL_CALENDAR` launch argument if you want to force real EventKit access instead.
+- The default `ChronoSieve` scheme currently runs unit tests only; UI tests are kept out of the default loop for faster iteration.
 - You can run on your personal iPhone/Apple Watch.
 - Distribution (App Store/TestFlight) requires paid Apple Developer Program.
 
