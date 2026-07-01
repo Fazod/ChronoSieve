@@ -1,5 +1,13 @@
 import Foundation
 
+enum RSVPStatus: String, Codable, Hashable {
+    case unknown
+    case accepted
+    case declined
+    case tentative
+    case notResponded
+}
+
 struct CalendarEvent: Identifiable, Hashable {
     let id: String
     let title: String
@@ -10,4 +18,5 @@ struct CalendarEvent: Identifiable, Hashable {
     let location: String?
     let calendarTitle: String
     let calendarColorHex: String
+    let rsvpStatus: RSVPStatus
 }

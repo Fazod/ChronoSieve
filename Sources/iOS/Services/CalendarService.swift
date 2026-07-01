@@ -147,7 +147,8 @@ final class CalendarService: CalendarServiceProtocol {
             notes: event.notes,
             location: event.location,
             calendarTitle: event.calendar.title,
-            calendarColorHex: UIColor(cgColor: event.calendar.cgColor).hexString
+            calendarColorHex: UIColor(cgColor: event.calendar.cgColor).hexString,
+            rsvpStatus: mapRSVPStatus(event)
         )
     }
 
@@ -191,6 +192,13 @@ final class CalendarService: CalendarServiceProtocol {
 
     private func overlaps(interval: DateInterval, startDate: Date, endDate: Date) -> Bool {
         startDate < interval.end && endDate > interval.start
+    }
+
+    private func mapRSVPStatus(_ event: EKEvent) -> RSVPStatus {
+        // For now, return .accepted as default
+        // EventKit provides limited RSVP status information in iOS
+        // Full status tracking would require additional API calls
+        return .accepted
     }
 }
 

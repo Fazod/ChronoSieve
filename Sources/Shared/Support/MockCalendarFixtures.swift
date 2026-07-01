@@ -38,7 +38,8 @@ enum MockCalendarFixtures {
                 notes: "Buy cake and send greeting 🎉",
                 location: nil,
                 calendarTitle: birthdaysCalendar.title,
-                calendarColorHex: birthdaysCalendar.colorHex
+                calendarColorHex: birthdaysCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-standup",
@@ -49,7 +50,8 @@ enum MockCalendarFixtures {
                 notes: "Daily sync\nTeams: https://teams.microsoft.com/l/meetup-join/19%3ameeting_mock_standup",
                 location: "Microsoft Teams",
                 calendarTitle: workCalendar.title,
-                calendarColorHex: workCalendar.colorHex
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-breakouts",
@@ -60,7 +62,8 @@ enum MockCalendarFixtures {
                 notes: "Split into pairs and capture action items.",
                 location: "Microsoft Teams",
                 calendarTitle: workCalendar.title,
-                calendarColorHex: workCalendar.colorHex
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .tentative
             ),
             CalendarEvent(
                 id: "mock-media-standup",
@@ -71,7 +74,8 @@ enum MockCalendarFixtures {
                 notes: "Agenda in Confluence: https://example.atlassian.net/wiki/spaces/CS/pages/standup",
                 location: "Microsoft Teams",
                 calendarTitle: workCalendar.title,
-                calendarColorHex: workCalendar.colorHex
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-rehearsal",
@@ -82,7 +86,8 @@ enum MockCalendarFixtures {
                 notes: "Bring referral documents and water bottle.",
                 location: "BBRZ, Vienna",
                 calendarTitle: personalCalendar.title,
-                calendarColorHex: personalCalendar.colorHex
+                calendarColorHex: personalCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-lunch",
@@ -93,7 +98,8 @@ enum MockCalendarFixtures {
                 notes: "Try the new ramen place nearby.",
                 location: "Neko Ramen",
                 calendarTitle: personalCalendar.title,
-                calendarColorHex: personalCalendar.colorHex
+                calendarColorHex: personalCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-maintenance-window",
@@ -104,7 +110,8 @@ enum MockCalendarFixtures {
                 notes: "Observe production rollout and verify metrics.",
                 location: "Remote",
                 calendarTitle: workCalendar.title,
-                calendarColorHex: workCalendar.colorHex
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-design-review",
@@ -115,7 +122,8 @@ enum MockCalendarFixtures {
                 notes: "Review grouped glass cards\nFigma: https://figma.com/file/mock-liquid-glass",
                 location: "Meeting Room 4B",
                 calendarTitle: workCalendar.title,
-                calendarColorHex: workCalendar.colorHex
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .notResponded
             ),
             CalendarEvent(
                 id: "mock-dentist",
@@ -126,7 +134,8 @@ enum MockCalendarFixtures {
                 notes: "Bring insurance card.",
                 location: "Mariahilfer Straße 88",
                 calendarTitle: personalCalendar.title,
-                calendarColorHex: personalCalendar.colorHex
+                calendarColorHex: personalCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-focus",
@@ -137,7 +146,8 @@ enum MockCalendarFixtures {
                 notes: "No meetings. Deep work.",
                 location: "Home Office",
                 calendarTitle: personalCalendar.title,
-                calendarColorHex: personalCalendar.colorHex
+                calendarColorHex: personalCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-offsite",
@@ -148,7 +158,8 @@ enum MockCalendarFixtures {
                 notes: "Two-day team offsite with roadmap planning.",
                 location: "Semmering",
                 calendarTitle: workCalendar.title,
-                calendarColorHex: workCalendar.colorHex
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-flight",
@@ -159,7 +170,8 @@ enum MockCalendarFixtures {
                 notes: "Check in online 24h before departure.",
                 location: "VIE → BER",
                 calendarTitle: travelCalendar.title,
-                calendarColorHex: travelCalendar.colorHex
+                calendarColorHex: travelCalendar.colorHex,
+                rsvpStatus: .accepted
             ),
             CalendarEvent(
                 id: "mock-family-dinner",
@@ -170,7 +182,8 @@ enum MockCalendarFixtures {
                 notes: "Bring dessert.",
                 location: "Parents' House",
                 calendarTitle: personalCalendar.title,
-                calendarColorHex: personalCalendar.colorHex
+                calendarColorHex: personalCalendar.colorHex,
+                rsvpStatus: .tentative
             )
         ]
         .sorted(by: { $0.startDate < $1.startDate })
