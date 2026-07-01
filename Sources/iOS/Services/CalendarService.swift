@@ -172,7 +172,8 @@ final class CalendarService: CalendarServiceProtocol {
             calendarColorHex: UIColor(cgColor: event.calendar.cgColor).hexString,
             rsvpStatus: mapRSVPStatus(event),
             attendees: mapAttendees(event),
-            recurrenceDescription: mapRecurrenceDescription(event)
+            recurrenceDescription: mapRecurrenceDescription(event),
+            isCancelled: event.status == .canceled
         )
     }
 

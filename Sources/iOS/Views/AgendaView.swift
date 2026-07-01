@@ -638,6 +638,9 @@ private struct EventRow: View {
 
     @State private var showingDetail = false
 
+    private var isPast: Bool { event.endDate < Date() }
+    private var isStruckThrough: Bool { event.isCancelled }
+
     var body: some View {
         Button {
             showingDetail = true
@@ -651,6 +654,7 @@ private struct EventRow: View {
         .buttonStyle(.plain)
         .padding(.horizontal, style == .agenda ? 0 : 12)
         .padding(.vertical, style == .agenda ? 12 : 6)
+        .opacity(isPast ? 0.46 : 1.0)
         .sheet(isPresented: $showingDetail) {
             EventDetailView(event: event)
         }
@@ -689,6 +693,7 @@ private struct EventRow: View {
                     .font(.headline)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
+                    .strikethrough(isStruckThrough, color: .primary)
 
                 HStack(spacing: 8) {
                     Label(event.calendarTitle, systemImage: "calendar")
@@ -728,6 +733,7 @@ private struct EventRow: View {
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
+                    .strikethrough(isStruckThrough, color: .white)
                     .opacity(isTentativeLike ? 0.92 : 1)
 
                 HStack(spacing: 8) {

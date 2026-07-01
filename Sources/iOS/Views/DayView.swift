@@ -244,18 +244,36 @@ struct DayTimelineView: View {
         let mins = CGFloat(now.timeIntervalSince(Calendar.current.startOfDay(for: date)) / 60)
         let y    = mins * hourHeight / 60
 
-        return HStack(spacing: 0) {
-            Spacer().frame(width: timeColumnWidth - 4)
+        return HStack(alignment: .center, spacing: 0) {
+            // Current time label replaces the hour number in the time column
+            Text(shortTimeLabel(for: now))
+                .font(.caption2.monospacedDigit().weight(.semibold))
+                .foregroundStyle(.red)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .frame(width: timeColumnWidth, alignment: .trailing)
+                .padding(.trailing, 5)
+
+            // Dot at the boundary between time column and event area
             Circle()
                 .fill(Color.red)
                 .frame(width: 8, height: 8)
+
+            // Horizontal rule across the full event area
             Rectangle()
-                .fill(Color.red)
+                .fill(Color.red.opacity(0.85))
                 .frame(height: 1.5)
                 .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity)
         .offset(y: y - 4)   // −4 centres the 8 pt circle on the line
+    }
+
+    private func shortTimeLabel(for date: Date) -> String {
+        let fmt = DateFormatter()
+        fmt.dateStyle = .none
+        fmt.timeStyle = .short
+        return fmt.string(from: date)
     }
 
     // MARK: – Event Layout
@@ -424,6 +442,9 @@ private struct DayEventBlock: View {
 
     @State private var showingDetail = false
 
+    private var isPast:          Bool { event.endDate < Date() }
+    private var isStruckThrough: Bool { event.isCancelled }
+
     var body: some View {
         Button { showingDetail = true } label: {
             HStack(spacing: 0) {
@@ -439,6 +460,7 @@ private struct DayEventBlock: View {
                         .foregroundStyle(.primary)
                         .lineLimit(blockHeight > 40 ? 2 : 1)
                         .fixedSize(horizontal: false, vertical: true)
+                        .strikethrough(isStruckThrough, color: .primary)
 
                     if blockHeight > 46, !event.isAllDay {
                         Text(startTimeText)
@@ -453,7 +475,7 @@ private struct DayEventBlock: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(calendarColor.opacity(0.15))
+            .background(calendarColor.opacity(isPast ? 0.08 : 0.15))
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
                     .stroke(calendarColor.opacity(0.25), lineWidth: 0.5)
@@ -461,6 +483,7 @@ private struct DayEventBlock: View {
             .clipShape(RoundedRectangle(cornerRadius: 4))
         }
         .buttonStyle(.plain)
+        .opacity(isPast ? 0.46 : 1.0)
         .sheet(isPresented: $showingDetail) {
             EventDetailView(event: event)
         }

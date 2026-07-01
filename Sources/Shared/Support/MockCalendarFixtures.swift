@@ -85,7 +85,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: birthdaysCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: "Repeats yearly"
+                recurrenceDescription: "Repeats yearly",
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-standup",
@@ -100,7 +101,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: workCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: standupAttendees,
-                recurrenceDescription: "Repeats every week on Monday, Tuesday, Wednesday, Thursday and Friday"
+                recurrenceDescription: "Repeats every week on Monday, Tuesday, Wednesday, Thursday and Friday",
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-breakouts",
@@ -115,7 +117,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: workCalendar.colorHex,
                 rsvpStatus: .tentative,
                 attendees: [],
-                recurrenceDescription: "Repeats every week on Monday, Tuesday, Wednesday, Thursday and Friday"
+                recurrenceDescription: "Repeats every week on Monday, Tuesday, Wednesday, Thursday and Friday",
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-media-standup",
@@ -130,7 +133,25 @@ enum MockCalendarFixtures {
                 calendarColorHex: workCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
+            ),
+            // Demo cancelled event
+            CalendarEvent(
+                id: "mock-cancelled-review",
+                title: "Abgesagt: Sprint Review",
+                startDate: timed(0, 13, 0),
+                endDate: timed(0, 13, 30),
+                isAllDay: false,
+                notes: nil,
+                location: "Microsoft Teams",
+                calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
+                calendarColorHex: workCalendar.colorHex,
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil,
+                isCancelled: true
             ),
             CalendarEvent(
                 id: "mock-rehearsal",
@@ -145,7 +166,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: personalCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-lunch",
@@ -160,7 +182,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: personalCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-maintenance-window",
@@ -175,7 +198,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: workCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-design-review",
@@ -190,7 +214,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: workCalendar.colorHex,
                 rsvpStatus: .notResponded,
                 attendees: designReviewAttendees,
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-dentist",
@@ -205,7 +230,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: personalCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-focus",
@@ -220,7 +246,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: personalCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-offsite",
@@ -235,7 +262,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: workCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-flight",
@@ -250,7 +278,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: travelCalendar.colorHex,
                 rsvpStatus: .accepted,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             ),
             CalendarEvent(
                 id: "mock-family-dinner",
@@ -265,7 +294,8 @@ enum MockCalendarFixtures {
                 calendarColorHex: personalCalendar.colorHex,
                 rsvpStatus: .tentative,
                 attendees: [],
-                recurrenceDescription: nil
+                recurrenceDescription: nil,
+                isCancelled: false
             )
         ]
         .sorted(by: { $0.startDate < $1.startDate })

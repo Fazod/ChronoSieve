@@ -42,4 +42,5 @@ struct CalendarEvent: Identifiable, Hashable {
     let rsvpStatus: RSVPStatus
     let attendees: [Attendee]
     let recurrenceDescription: String?
+    let isCancelled: Bool
 }
