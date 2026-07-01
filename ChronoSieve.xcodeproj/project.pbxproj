@@ -1,0 +1,740 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00038FC04F3CED80307A604A /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06643D45E899BB335D56D0D9 /* CalendarSource.swift */; };
+		0C5D070F93DF8B62B4DB5BFA /* FilterRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */; };
+		0F3A901B82CAA4250CE90194 /* AgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89CAF70713B2F04DA7AA7242 /* AgendaView.swift */; };
+		323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06643D45E899BB335D56D0D9 /* CalendarSource.swift */; };
+		3B39D654E4E2A9266F61793B /* FilterRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF3798727C1DA99D985DDD3 /* FilterRule.swift */; };
+		3EBE38906DCB103D731F232B /* WatchConnectivityReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */; };
+		41F16949A5D2D2B5A82AD551 /* RegexFilterEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */; };
+		4B0B1B825460D287DF543498 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1B62E00FBDF38347DC994D /* NotificationNames.swift */; };
+		4F00F235970295DE8C9755BF /* ChronoSieveWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */; };
+		539D95640D77839D6F289335 /* WatchAgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */; };
+		56887D7EA34A736DDC5B07DA /* AgendaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74321E5BC0986716ED5E1047 /* AgendaViewModel.swift */; };
+		69639BCB8F7822CFC7BD6C12 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008374DEF4E357B2D44D92E /* CalendarEvent.swift */; };
+		69E160C5DD744785561359C9 /* RegexFilterEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */; };
+		7AFAA17CA7288953F51EAFB2 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811E1274ED18EAE41A4FAB3F /* CalendarService.swift */; };
+		83FEEFEA91807A83762CD2A4 /* FilterRuleRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76119AA9E83004428270632C /* FilterRuleRecord.swift */; };
+		A4C67F74D9B82C650E9CFC5B /* AgendaSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */; };
+		A59D56ED9BC53B412F27E65F /* AgendaSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */; };
+		A8C466239400616DBE2DE4B7 /* ChronoSieveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5766FB0D43AF8AC7363E7820 /* ChronoSieveApp.swift */; };
+		B27137F3C500F742D729816F /* RegexFilterEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */; };
+		C92C45AC90812BD714FE0C1E /* WatchSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656DC1DE31C305005B7089C3 /* WatchSyncService.swift */; };
+		CA711929B228665F6783D2F5 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008374DEF4E357B2D44D92E /* CalendarEvent.swift */; };
+		DF929E0A55AA71785591C2EE /* FilterRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF3798727C1DA99D985DDD3 /* FilterRule.swift */; };
+		E340534F4975A4A675C62230 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1B62E00FBDF38347DC994D /* NotificationNames.swift */; };
+		F1F7D6663078C58CEA5EA185 /* ChronoSieveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64383037FF88A167D41F4873 /* ChronoSieveUITests.swift */; };
+		FB180C6B8A557E253BA46B87 /* WatchAgendaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3A64ED520CAAA0D5BFB3AF8A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36BB9081F222624497E4A125 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A7BEC5D8151B0763F432008;
+			remoteInfo = ChronoSieve;
+		};
+		C5A647C850B941EBE2401E07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36BB9081F222624497E4A125 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A7BEC5D8151B0763F432008;
+			remoteInfo = ChronoSieve;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		06643D45E899BB335D56D0D9 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
+		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaSnapshot.swift; sourceTree = "<group>"; };
+		4DF3798727C1DA99D985DDD3 /* FilterRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRule.swift; sourceTree = "<group>"; };
+		4E1B62E00FBDF38347DC994D /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
+		5766FB0D43AF8AC7363E7820 /* ChronoSieveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveApp.swift; sourceTree = "<group>"; };
+		5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRulesView.swift; sourceTree = "<group>"; };
+		64383037FF88A167D41F4873 /* ChronoSieveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveUITests.swift; sourceTree = "<group>"; };
+		656DC1DE31C305005B7089C3 /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
+		6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityReceiver.swift; sourceTree = "<group>"; };
+		6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoSieve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		74321E5BC0986716ED5E1047 /* AgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaViewModel.swift; sourceTree = "<group>"; };
+		76119AA9E83004428270632C /* FilterRuleRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRuleRecord.swift; sourceTree = "<group>"; };
+		8003747F52A24B8A3043D9BD /* ChronoSieveWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoSieveWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8008374DEF4E357B2D44D92E /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
+		811E1274ED18EAE41A4FAB3F /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
+		89CAF70713B2F04DA7AA7242 /* AgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaView.swift; sourceTree = "<group>"; };
+		8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexFilterEngineTests.swift; sourceTree = "<group>"; };
+		923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveWatchApp.swift; sourceTree = "<group>"; };
+		93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexFilterEngine.swift; sourceTree = "<group>"; };
+		A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaViewModel.swift; sourceTree = "<group>"; };
+		D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0A4F72D7984AD9955730CDF1 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				74321E5BC0986716ED5E1047 /* AgendaViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		1E0F912E33C7850165D3B6CF /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				811E1274ED18EAE41A4FAB3F /* CalendarService.swift */,
+				656DC1DE31C305005B7089C3 /* WatchSyncService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		23BF91B7D7187DB977259BA1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */,
+				1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */,
+				93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */,
+				8003747F52A24B8A3043D9BD /* ChronoSieveWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3143033DE8CD80E6F51F7C54 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */,
+				4E1B62E00FBDF38347DC994D /* NotificationNames.swift */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		3D43C8947334E3F11962DC50 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				89CAF70713B2F04DA7AA7242 /* AgendaView.swift */,
+				5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4B46DD391E428F2507B46E4D = {
+			isa = PBXGroup;
+			children = (
+				9CBCBA36C621DB74837B4C8B /* iOS */,
+				B9010102C44112C04142206F /* iOS */,
+				DFD9ABBAF1B19C887F8852A1 /* iOSUITests */,
+				72F334840B3CB0E137760840 /* Shared */,
+				7DD9FACA165FD5E465BD6A6F /* watchOS */,
+				23BF91B7D7187DB977259BA1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4CDBA769ACABCE92B76E8FCF /* Filtering */ = {
+			isa = PBXGroup;
+			children = (
+				93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */,
+			);
+			path = Filtering;
+			sourceTree = "<group>";
+		};
+		54D6BFBAAD160D2CE92DF0E4 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		5E20650E27082C3FE2610609 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				76119AA9E83004428270632C /* FilterRuleRecord.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		72F334840B3CB0E137760840 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4CDBA769ACABCE92B76E8FCF /* Filtering */,
+				846B3319252746235EF036A9 /* Models */,
+				3143033DE8CD80E6F51F7C54 /* Sync */,
+			);
+			name = Shared;
+			path = Sources/Shared;
+			sourceTree = "<group>";
+		};
+		7DD9FACA165FD5E465BD6A6F /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */,
+				A3514C53AB9E56CB57B8BF25 /* Services */,
+				54D6BFBAAD160D2CE92DF0E4 /* ViewModels */,
+				C415B0C3E6E8F1859ADD879A /* Views */,
+			);
+			name = watchOS;
+			path = Sources/watchOS;
+			sourceTree = "<group>";
+		};
+		846B3319252746235EF036A9 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8008374DEF4E357B2D44D92E /* CalendarEvent.swift */,
+				06643D45E899BB335D56D0D9 /* CalendarSource.swift */,
+				4DF3798727C1DA99D985DDD3 /* FilterRule.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9CBCBA36C621DB74837B4C8B /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				5766FB0D43AF8AC7363E7820 /* ChronoSieveApp.swift */,
+				5E20650E27082C3FE2610609 /* Persistence */,
+				1E0F912E33C7850165D3B6CF /* Services */,
+				0A4F72D7984AD9955730CDF1 /* ViewModels */,
+				3D43C8947334E3F11962DC50 /* Views */,
+			);
+			name = iOS;
+			path = Sources/iOS;
+			sourceTree = "<group>";
+		};
+		A3514C53AB9E56CB57B8BF25 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		B9010102C44112C04142206F /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */,
+			);
+			name = iOS;
+			path = Tests/iOS;
+			sourceTree = "<group>";
+		};
+		C415B0C3E6E8F1859ADD879A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		DFD9ABBAF1B19C887F8852A1 /* iOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				64383037FF88A167D41F4873 /* ChronoSieveUITests.swift */,
+			);
+			name = iOSUITests;
+			path = Tests/iOSUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4FD2619C27E97A9167E01FC8 /* ChronoSieveUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 150D1DD7FADB4621026D1CB8 /* Build configuration list for PBXNativeTarget "ChronoSieveUITests" */;
+			buildPhases = (
+				8B12FD693A71BD9E1E051F33 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				106A7F587DE1B88C918D2219 /* PBXTargetDependency */,
+			);
+			name = ChronoSieveUITests;
+			packageProductDependencies = (
+			);
+			productName = ChronoSieveUITests;
+			productReference = 93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		5A7BEC5D8151B0763F432008 /* ChronoSieve */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72CE1B6B02085634D32E13B4 /* Build configuration list for PBXNativeTarget "ChronoSieve" */;
+			buildPhases = (
+				7D12CEC45B15134AC668CE7E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChronoSieve;
+			packageProductDependencies = (
+			);
+			productName = ChronoSieve;
+			productReference = 6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B91AA1FD5C82381A29345420 /* ChronoSieveWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA14BE58D474D85E8A95EA92 /* Build configuration list for PBXNativeTarget "ChronoSieveWatch" */;
+			buildPhases = (
+				CD0493A475F4FF994B0C2113 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChronoSieveWatch;
+			packageProductDependencies = (
+			);
+			productName = ChronoSieveWatch;
+			productReference = 8003747F52A24B8A3043D9BD /* ChronoSieveWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D679A99A6723E0F057618E0C /* ChronoSieveTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FB8FB43229B6AD66584D180 /* Build configuration list for PBXNativeTarget "ChronoSieveTests" */;
+			buildPhases = (
+				2F1D8C256E408A8D3D37A809 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8A8B6A677673C1CD27892370 /* PBXTargetDependency */,
+			);
+			name = ChronoSieveTests;
+			packageProductDependencies = (
+			);
+			productName = ChronoSieveTests;
+			productReference = 1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		36BB9081F222624497E4A125 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4FD2619C27E97A9167E01FC8 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = 5A7BEC5D8151B0763F432008;
+					};
+					5A7BEC5D8151B0763F432008 = {
+						ProvisioningStyle = Automatic;
+					};
+					B91AA1FD5C82381A29345420 = {
+						ProvisioningStyle = Automatic;
+					};
+					D679A99A6723E0F057618E0C = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 355AD239FB58DE7FB61F421E /* Build configuration list for PBXProject "ChronoSieve" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4B46DD391E428F2507B46E4D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 23BF91B7D7187DB977259BA1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5A7BEC5D8151B0763F432008 /* ChronoSieve */,
+				D679A99A6723E0F057618E0C /* ChronoSieveTests */,
+				4FD2619C27E97A9167E01FC8 /* ChronoSieveUITests */,
+				B91AA1FD5C82381A29345420 /* ChronoSieveWatch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2F1D8C256E408A8D3D37A809 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69E160C5DD744785561359C9 /* RegexFilterEngineTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7D12CEC45B15134AC668CE7E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A59D56ED9BC53B412F27E65F /* AgendaSnapshot.swift in Sources */,
+				0F3A901B82CAA4250CE90194 /* AgendaView.swift in Sources */,
+				56887D7EA34A736DDC5B07DA /* AgendaViewModel.swift in Sources */,
+				69639BCB8F7822CFC7BD6C12 /* CalendarEvent.swift in Sources */,
+				7AFAA17CA7288953F51EAFB2 /* CalendarService.swift in Sources */,
+				323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */,
+				A8C466239400616DBE2DE4B7 /* ChronoSieveApp.swift in Sources */,
+				3B39D654E4E2A9266F61793B /* FilterRule.swift in Sources */,
+				83FEEFEA91807A83762CD2A4 /* FilterRuleRecord.swift in Sources */,
+				0C5D070F93DF8B62B4DB5BFA /* FilterRulesView.swift in Sources */,
+				4B0B1B825460D287DF543498 /* NotificationNames.swift in Sources */,
+				41F16949A5D2D2B5A82AD551 /* RegexFilterEngine.swift in Sources */,
+				C92C45AC90812BD714FE0C1E /* WatchSyncService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B12FD693A71BD9E1E051F33 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1F7D6663078C58CEA5EA185 /* ChronoSieveUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0493A475F4FF994B0C2113 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4C67F74D9B82C650E9CFC5B /* AgendaSnapshot.swift in Sources */,
+				CA711929B228665F6783D2F5 /* CalendarEvent.swift in Sources */,
+				00038FC04F3CED80307A604A /* CalendarSource.swift in Sources */,
+				4F00F235970295DE8C9755BF /* ChronoSieveWatchApp.swift in Sources */,
+				DF929E0A55AA71785591C2EE /* FilterRule.swift in Sources */,
+				E340534F4975A4A675C62230 /* NotificationNames.swift in Sources */,
+				B27137F3C500F742D729816F /* RegexFilterEngine.swift in Sources */,
+				539D95640D77839D6F289335 /* WatchAgendaView.swift in Sources */,
+				FB180C6B8A557E253BA46B87 /* WatchAgendaViewModel.swift in Sources */,
+				3EBE38906DCB103D731F232B /* WatchConnectivityReceiver.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		106A7F587DE1B88C918D2219 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A7BEC5D8151B0763F432008 /* ChronoSieve */;
+			targetProxy = C5A647C850B941EBE2401E07 /* PBXContainerItemProxy */;
+		};
+		8A8B6A677673C1CD27892370 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A7BEC5D8151B0763F432008 /* ChronoSieve */;
+			targetProxy = 3A64ED520CAAA0D5BFB3AF8A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		02F6F3232076D6FC85A3E37F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ChronoSieve;
+			};
+			name = Release;
+		};
+		1BA9914BE7148299D9103F44 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Y9ARKG2EC6;
+				INFOPLIST_FILE = Resources/iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		54C6CA3DC25954FA62D4E189 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ChronoSieve.app/ChronoSieve";
+			};
+			name = Debug;
+		};
+		5B04F2422823A66840C28E7F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Y9ARKG2EC6;
+				INFOPLIST_FILE = Resources/iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		60F17292C9E285E587E81AC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.1;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		6618E1A31DAF07CD57D743E2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ChronoSieve.app/ChronoSieve";
+			};
+			name = Release;
+		};
+		67D23DA4B2B6E29A14762DC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = Y9ARKG2EC6;
+				INFOPLIST_FILE = Resources/watchOS/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.watch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		744E533AFDA99C1E2FC52D75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = Y9ARKG2EC6;
+				INFOPLIST_FILE = Resources/watchOS/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.watch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		AACE9F22DCA2D7ADEA24BBD5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ChronoSieve;
+			};
+			name = Debug;
+		};
+		C05396B79C22CD5FF266EB26 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.1;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		150D1DD7FADB4621026D1CB8 /* Build configuration list for PBXNativeTarget "ChronoSieveUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AACE9F22DCA2D7ADEA24BBD5 /* Debug */,
+				02F6F3232076D6FC85A3E37F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		355AD239FB58DE7FB61F421E /* Build configuration list for PBXProject "ChronoSieve" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60F17292C9E285E587E81AC1 /* Debug */,
+				C05396B79C22CD5FF266EB26 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		72CE1B6B02085634D32E13B4 /* Build configuration list for PBXNativeTarget "ChronoSieve" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B04F2422823A66840C28E7F /* Debug */,
+				1BA9914BE7148299D9103F44 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8FB8FB43229B6AD66584D180 /* Build configuration list for PBXNativeTarget "ChronoSieveTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54C6CA3DC25954FA62D4E189 /* Debug */,
+				6618E1A31DAF07CD57D743E2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CA14BE58D474D85E8A95EA92 /* Build configuration list for PBXNativeTarget "ChronoSieveWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				744E533AFDA99C1E2FC52D75 /* Debug */,
+				67D23DA4B2B6E29A14762DC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 36BB9081F222624497E4A125 /* Project object */;
+}
