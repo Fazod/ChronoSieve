@@ -7,6 +7,7 @@ protocol CalendarServiceProtocol {
     func requestAccess() async -> Bool
     func fetchCalendars() async -> [CalendarSource]
     func fetchEvents(in interval: DateInterval, calendarIDs: Set<String>) async -> [CalendarEvent]
+    func moveEvent(_ eventID: String, toCalendarID calendarID: String) async throws
     func setChangeHandler(_ handler: @escaping () -> Void)
 }
 
@@ -124,6 +125,26 @@ final class CalendarService: CalendarServiceProtocol {
         changeHandler = handler
     }
 
+    func moveEvent(_ eventID: String, toCalendarID calendarID: String) async throws {
+        // Strip the recurring-instance suffix (#timestamp) to get the base identifier
+        let baseID = String(eventID.split(separator: "#", maxSplits: 1).first ?? Substring(eventID))
+
+        guard let item = eventStore.calendarItem(withIdentifier: baseID),
+              let ekEvent = item as? EKEvent
+        else {
+            throw CalendarServiceError.eventNotFound
+        }
+
+        guard let targetCalendar = eventStore.calendar(withIdentifier: calendarID) else {
+            throw CalendarServiceError.calendarNotFound
+        }
+
+        ekEvent.calendar = targetCalendar
+        // For recurring events change the whole series; single events use thisEvent
+        let span: EKSpan = (ekEvent.recurrenceRules?.isEmpty == false) ? .futureEvents : .thisEvent
+        try eventStore.save(ekEvent, span: span, commit: true)
+    }
+
     private func makeExpandedQueryInterval(from interval: DateInterval) -> DateInterval {
         let calendar = Calendar.autoupdatingCurrent
         let start = calendar.date(byAdding: .day, value: -1, to: interval.start) ?? interval.start.addingTimeInterval(-86_400)
@@ -147,8 +168,11 @@ final class CalendarService: CalendarServiceProtocol {
             notes: event.notes,
             location: event.location,
             calendarTitle: event.calendar.title,
+            calendarID: event.calendar.calendarIdentifier,
             calendarColorHex: UIColor(cgColor: event.calendar.cgColor).hexString,
-            rsvpStatus: mapRSVPStatus(event)
+            rsvpStatus: mapRSVPStatus(event),
+            attendees: mapAttendees(event),
+            recurrenceDescription: mapRecurrenceDescription(event)
         )
     }
 
@@ -195,11 +219,106 @@ final class CalendarService: CalendarServiceProtocol {
     }
 
     private func mapRSVPStatus(_ event: EKEvent) -> RSVPStatus {
-        // For now, return .accepted as default
-        // EventKit provides limited RSVP status information in iOS
-        // Full status tracking would require additional API calls
-        return .accepted
+        guard let attendees = event.attendees,
+              let self_ = attendees.first(where: { $0.isCurrentUser }) else {
+            // No attendee list or current user not found — treat as accepted (own event)
+            return .accepted
+        }
+        return mapParticipantStatus(self_.participantStatus)
     }
+
+    private func mapAttendees(_ event: EKEvent) -> [Attendee] {
+        guard let participants = event.attendees else { return [] }
+
+        return participants
+            .compactMap { participant -> Attendee? in
+                let rawEmail = participant.url.absoluteString
+                    .replacingOccurrences(of: "mailto:", with: "")
+                let email: String? = rawEmail.contains("@") ? rawEmail : nil
+
+                guard let name = participant.name, !name.isEmpty else { return nil }
+
+                return Attendee(
+                    id: email ?? name,
+                    name: name,
+                    email: email,
+                    rsvpStatus: mapParticipantStatus(participant.participantStatus),
+                    isOrganizer: participant.participantRole == .chair,
+                    isOptional: participant.participantRole == .optional
+                )
+            }
+            .sorted { lhs, rhs in
+                if lhs.isOrganizer != rhs.isOrganizer { return lhs.isOrganizer }
+                return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+            }
+    }
+
+    private func mapParticipantStatus(_ status: EKParticipantStatus) -> RSVPStatus {
+        switch status {
+        case .accepted:  return .accepted
+        case .declined:  return .declined
+        case .tentative: return .tentative
+        case .pending:   return .notResponded
+        default:         return .unknown
+        }
+    }
+
+    private func mapRecurrenceDescription(_ event: EKEvent) -> String? {
+        guard let rule = event.recurrenceRules?.first else { return nil }
+
+        let intervalStr = rule.interval > 1 ? " \(rule.interval)" : ""
+
+        switch rule.frequency {
+        case .daily:
+            return rule.interval == 1 ? "Repeats daily" : "Repeats every \(rule.interval) days"
+
+        case .weekly:
+            if let days = rule.daysOfTheWeek, !days.isEmpty {
+                let weekdayOrder: [EKWeekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
+                let sorted = days
+                    .sorted { (weekdayOrder.firstIndex(of: $0.dayOfTheWeek) ?? 9) < (weekdayOrder.firstIndex(of: $1.dayOfTheWeek) ?? 9) }
+                    .map { weekdayFullName($0.dayOfTheWeek) }
+                let joined = listJoined(sorted)
+                return rule.interval == 1
+                    ? "Repeats every week on \(joined)"
+                    : "Repeats every \(rule.interval) weeks on \(joined)"
+            }
+            return rule.interval == 1 ? "Repeats weekly" : "Repeats every\(intervalStr) weeks"
+
+        case .monthly:
+            return rule.interval == 1 ? "Repeats monthly" : "Repeats every\(intervalStr) months"
+
+        case .yearly:
+            return "Repeats yearly"
+
+        @unknown default:
+            return nil
+        }
+    }
+
+    private func weekdayFullName(_ day: EKWeekday) -> String {
+        switch day {
+        case .sunday:    return "Sunday"
+        case .monday:    return "Monday"
+        case .tuesday:   return "Tuesday"
+        case .wednesday: return "Wednesday"
+        case .thursday:  return "Thursday"
+        case .friday:    return "Friday"
+        case .saturday:  return "Saturday"
+        @unknown default: return "Unknown"
+        }
+    }
+
+    private func listJoined(_ items: [String]) -> String {
+        guard items.count > 1 else { return items.first ?? "" }
+        let allButLast = items.dropLast().joined(separator: ", ")
+        return "\(allButLast) and \(items.last!)"
+    }
+}
+
+enum CalendarServiceError: Error {
+    case eventNotFound
+    case calendarNotFound
 }
 
 private extension UIColor {

@@ -55,6 +55,16 @@ final class AgendaViewModel: ObservableObject {
         applyFilters()
     }
 
+    func moveEvent(_ event: CalendarEvent, toCalendarID calendarID: String) async {
+        do {
+            try await calendarService.moveEvent(event.id, toCalendarID: calendarID)
+            await refresh(force: true)
+        } catch {
+            // Event store will fire a change notification on its own if something
+            // else caused a refresh; silently ignore move errors for now.
+        }
+    }
+
     func updateEnabledCalendars(_ ids: Set<String>) {
         enabledCalendarIDs = ids.intersection(Set(availableCalendars.map(\.id)))
         persistSelectedCalendarIDs()

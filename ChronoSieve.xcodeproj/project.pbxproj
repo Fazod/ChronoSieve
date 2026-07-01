@@ -16,6 +16,7 @@
 		3B39D654E4E2A9266F61793B /* FilterRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF3798727C1DA99D985DDD3 /* FilterRule.swift */; };
 		3EBE38906DCB103D731F232B /* WatchConnectivityReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */; };
 		41F16949A5D2D2B5A82AD551 /* RegexFilterEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */; };
+		42AB290C21B57D37A2130547 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF043204E6CBF4120E385587 /* EventDetailView.swift */; };
 		4B0B1B825460D287DF543498 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1B62E00FBDF38347DC994D /* NotificationNames.swift */; };
 		4F00F235970295DE8C9755BF /* ChronoSieveWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */; };
 		539D95640D77839D6F289335 /* WatchAgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */; };
@@ -83,6 +84,7 @@
 		A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaViewModel.swift; sourceTree = "<group>"; };
 		A42B4D5D2DF128083900C6DA /* MockCalendarFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCalendarFixtures.swift; sourceTree = "<group>"; };
 		D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaView.swift; sourceTree = "<group>"; };
+		FF043204E6CBF4120E385587 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				89CAF70713B2F04DA7AA7242 /* AgendaView.swift */,
+				FF043204E6CBF4120E385587 /* EventDetailView.swift */,
 				5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */,
 			);
 			path = Views;
@@ -402,6 +405,7 @@
 				7AFAA17CA7288953F51EAFB2 /* CalendarService.swift in Sources */,
 				323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */,
 				A8C466239400616DBE2DE4B7 /* ChronoSieveApp.swift in Sources */,
+				42AB290C21B57D37A2130547 /* EventDetailView.swift in Sources */,
 				3B39D654E4E2A9266F61793B /* FilterRule.swift in Sources */,
 				83FEEFEA91807A83762CD2A4 /* FilterRuleRecord.swift in Sources */,
 				0C5D070F93DF8B62B4DB5BFA /* FilterRulesView.swift in Sources */,

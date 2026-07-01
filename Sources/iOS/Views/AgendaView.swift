@@ -60,6 +60,7 @@ struct AgendaView: View {
                 syncRulesToViewModel()
             }
         }
+        .environmentObject(viewModel)
     }
 
     private var agendaScrollView: some View {
@@ -598,31 +599,24 @@ private struct EventRow: View {
     let event: CalendarEvent
     let style: EventGroupStyle
 
-    @State private var isExpanded = false
+    @State private var showingDetail = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: isExpanded ? 10 : 0) {
-            Button {
-                withAnimation(.snappy) {
-                    isExpanded.toggle()
-                }
-            } label: {
-                if style == .agenda {
-                    agendaRow
-                } else {
-                    cardRow
-                }
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
-                expandedContent
-                    .padding(.leading, style == .agenda ? 23 : 68)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+        Button {
+            showingDetail = true
+        } label: {
+            if style == .agenda {
+                agendaRow
+            } else {
+                cardRow
             }
         }
+        .buttonStyle(.plain)
         .padding(.horizontal, style == .agenda ? 0 : 12)
         .padding(.vertical, style == .agenda ? 12 : 6)
+        .sheet(isPresented: $showingDetail) {
+            EventDetailView(event: event)
+        }
     }
 
     private var cardRow: some View {
@@ -656,7 +650,7 @@ private struct EventRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.title)
                     .font(.headline)
-                    .lineLimit(isExpanded ? nil : 2)
+                    .lineLimit(2)
                     .multilineTextAlignment(.leading)
 
                 HStack(spacing: 8) {
@@ -665,7 +659,7 @@ private struct EventRow: View {
 
                     if let location = event.location, !location.isEmpty {
                         Label(location, systemImage: "mappin.and.ellipse")
-                            .lineLimit(isExpanded ? 2 : 1)
+                            .lineLimit(1)
                     }
                 }
                 .font(.caption)
@@ -674,7 +668,7 @@ private struct EventRow: View {
 
             Spacer(minLength: 0)
 
-            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+            Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.tertiary)
                 .padding(.top, 2)
@@ -695,7 +689,7 @@ private struct EventRow: View {
                 Text(event.title)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.white)
-                    .lineLimit(isExpanded ? nil : 2)
+                    .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .opacity(isTentativeLike ? 0.92 : 1)
 
@@ -705,7 +699,7 @@ private struct EventRow: View {
 
                     if let location = event.location, !location.isEmpty {
                         Label(location, systemImage: "mappin.and.ellipse")
-                            .lineLimit(isExpanded ? 2 : 1)
+                            .lineLimit(1)
                     }
                 }
                 .font(.caption)
@@ -714,42 +708,17 @@ private struct EventRow: View {
 
             Spacer(minLength: 0)
 
-            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.28))
-                .padding(.top, 5)
-        }
-        .contentShape(Rectangle())
-    }
-
-    private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            if let location = event.location, !location.isEmpty {
-                Label(location, systemImage: "mappin.and.ellipse")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if let notes = trimmedNotes, !notes.isEmpty {
-                Text(notes)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if !detectedLinks.isEmpty {
-                ForEach(detectedLinks, id: \.absoluteString) { url in
-                    Link(destination: url) {
-                        Label(url.absoluteString, systemImage: "link")
-                            .font(.footnote)
-                            .lineLimit(1)
+            // Attendee count badge when there are attendees
+            if !event.attendees.isEmpty {
+                HStack(spacing: -8) {
+                    ForEach(Array(event.attendees.prefix(3)), id: \.id) { attendee in
+                        MiniAttendeeAvatar(attendee: attendee)
                     }
                 }
+                .padding(.top, 3)
             }
         }
+        .contentShape(Rectangle())
     }
 
     private var timeRangeText: String {
@@ -763,28 +732,41 @@ private struct EventRow: View {
     private var isTentativeLike: Bool {
         event.rsvpStatus == .tentative || event.rsvpStatus == .notResponded
     }
+}
 
-    private var trimmedNotes: String? {
-        event.notes?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+// Tiny stacked avatar shown on the agenda row when an event has attendees
+private struct MiniAttendeeAvatar: View {
+    let attendee: Attendee
+    private let size: CGFloat = 20
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.black)
+                .frame(width: size + 2, height: size + 2)
+
+            Circle()
+                .fill(avatarColor)
+                .frame(width: size, height: size)
+
+            Text(attendee.initials)
+                .font(.system(size: 7, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+        }
     }
 
-    private var detectedLinks: [URL] {
-        let sourceText = [event.location, event.notes]
-            .compactMap { $0 }
-            .joined(separator: "\n")
-
-        guard !sourceText.isEmpty,
-              let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-        else {
-            return []
+    private var avatarColor: Color {
+        let palette: [(Double, Double, Double)] = [
+            (0.55, 0.60, 0.65), (0.20, 0.54, 0.88), (0.12, 0.70, 0.52),
+            (0.86, 0.44, 0.20), (0.62, 0.32, 0.78), (0.82, 0.26, 0.28),
+            (0.16, 0.66, 0.36), (0.88, 0.65, 0.08),
+        ]
+        var hash = 5381
+        for scalar in attendee.name.unicodeScalars {
+            hash = ((hash << 5) &+ hash) &+ Int(scalar.value)
         }
-
-        let range = NSRange(sourceText.startIndex..<sourceText.endIndex, in: sourceText)
-        let urls = detector.matches(in: sourceText, options: [], range: range).compactMap(\.url)
-
-        var seen = Set<String>()
-        return urls.filter { seen.insert($0.absoluteString).inserted }
+        let (r, g, b) = palette[abs(hash) % palette.count]
+        return Color(red: r, green: g, blue: b)
     }
 }
 

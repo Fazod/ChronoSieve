@@ -26,6 +26,10 @@ final class MockCalendarService: CalendarServiceProtocol {
             .sorted(by: { $0.startDate < $1.startDate })
     }
 
+    func moveEvent(_ eventID: String, toCalendarID calendarID: String) async throws {
+        // No-op in mock — live data refreshes on next fetch
+    }
+
     func setChangeHandler(_ handler: @escaping () -> Void) {
         changeHandler = handler
     }

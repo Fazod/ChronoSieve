@@ -10,6 +10,49 @@ enum MockCalendarFixtures {
         [workCalendar, personalCalendar, birthdaysCalendar, travelCalendar]
     }
 
+    // MARK: - Mock Attendees
+
+    static let standupAttendees: [Attendee] = [
+        Attendee(id: "manfred.krammer@company.com", name: "Manfred Krammer",
+                 email: "manfred.krammer@company.com",
+                 rsvpStatus: .accepted, isOrganizer: true, isOptional: false),
+        Attendee(id: "kateryna.borsuk@company.com", name: "Kateryna Borsuk",
+                 email: "kateryna.borsuk@company.com",
+                 rsvpStatus: .accepted, isOrganizer: false, isOptional: false),
+        Attendee(id: "velizar.demirev@company.com", name: "Velizar Demirev",
+                 email: "velizar.demirev@company.com",
+                 rsvpStatus: .accepted, isOrganizer: false, isOptional: false),
+        Attendee(id: "lukas.bachlechner@company.com", name: "Lukas Bachlechner",
+                 email: "lukas.bachlechner@company.com",
+                 rsvpStatus: .accepted, isOrganizer: false, isOptional: false),
+        Attendee(id: "rainer.burgstaller@company.com", name: "Rainer Burgstaller",
+                 email: "rainer.burgstaller@company.com",
+                 rsvpStatus: .declined, isOrganizer: false, isOptional: false),
+        Attendee(id: "fabian.denk@company.com", name: "Fabian Denk",
+                 email: "fabian.denk@company.com",
+                 rsvpStatus: .tentative, isOrganizer: false, isOptional: true),
+        Attendee(id: "mario.strohmeier@company.com", name: "Mario Strohmeier",
+                 email: "mario.strohmeier@company.com",
+                 rsvpStatus: .notResponded, isOrganizer: false, isOptional: false),
+        Attendee(id: "marvin.horitani@company.com", name: "Marvin Horitani",
+                 email: "marvin.horitani@company.com",
+                 rsvpStatus: .declined, isOrganizer: false, isOptional: true),
+    ]
+
+    static let designReviewAttendees: [Attendee] = [
+        Attendee(id: "anna.mueller@company.com", name: "Anna Müller",
+                 email: "anna.mueller@company.com",
+                 rsvpStatus: .accepted, isOrganizer: true, isOptional: false),
+        Attendee(id: "fabian.denk@company.com", name: "Fabian Denk",
+                 email: "fabian.denk@company.com",
+                 rsvpStatus: .notResponded, isOrganizer: false, isOptional: false),
+        Attendee(id: "thomas.huber@company.com", name: "Thomas Huber",
+                 email: "thomas.huber@company.com",
+                 rsvpStatus: .tentative, isOrganizer: false, isOptional: true),
+    ]
+
+    // MARK: - Events
+
     static func events(referenceDate: Date = Date()) -> [CalendarEvent] {
         let calendar = Calendar.autoupdatingCurrent
         let baseDay = calendar.startOfDay(for: referenceDate)
@@ -38,8 +81,11 @@ enum MockCalendarFixtures {
                 notes: "Buy cake and send greeting 🎉",
                 location: nil,
                 calendarTitle: birthdaysCalendar.title,
+                calendarID: birthdaysCalendar.id,
                 calendarColorHex: birthdaysCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: "Repeats yearly"
             ),
             CalendarEvent(
                 id: "mock-standup",
@@ -50,8 +96,11 @@ enum MockCalendarFixtures {
                 notes: "Daily sync\nTeams: https://teams.microsoft.com/l/meetup-join/19%3ameeting_mock_standup",
                 location: "Microsoft Teams",
                 calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
                 calendarColorHex: workCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: standupAttendees,
+                recurrenceDescription: "Repeats every week on Monday, Tuesday, Wednesday, Thursday and Friday"
             ),
             CalendarEvent(
                 id: "mock-breakouts",
@@ -62,8 +111,11 @@ enum MockCalendarFixtures {
                 notes: "Split into pairs and capture action items.",
                 location: "Microsoft Teams",
                 calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
                 calendarColorHex: workCalendar.colorHex,
-                rsvpStatus: .tentative
+                rsvpStatus: .tentative,
+                attendees: [],
+                recurrenceDescription: "Repeats every week on Monday, Tuesday, Wednesday, Thursday and Friday"
             ),
             CalendarEvent(
                 id: "mock-media-standup",
@@ -74,8 +126,11 @@ enum MockCalendarFixtures {
                 notes: "Agenda in Confluence: https://example.atlassian.net/wiki/spaces/CS/pages/standup",
                 location: "Microsoft Teams",
                 calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
                 calendarColorHex: workCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-rehearsal",
@@ -86,8 +141,11 @@ enum MockCalendarFixtures {
                 notes: "Bring referral documents and water bottle.",
                 location: "BBRZ, Vienna",
                 calendarTitle: personalCalendar.title,
+                calendarID: personalCalendar.id,
                 calendarColorHex: personalCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-lunch",
@@ -98,8 +156,11 @@ enum MockCalendarFixtures {
                 notes: "Try the new ramen place nearby.",
                 location: "Neko Ramen",
                 calendarTitle: personalCalendar.title,
+                calendarID: personalCalendar.id,
                 calendarColorHex: personalCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-maintenance-window",
@@ -110,8 +171,11 @@ enum MockCalendarFixtures {
                 notes: "Observe production rollout and verify metrics.",
                 location: "Remote",
                 calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
                 calendarColorHex: workCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-design-review",
@@ -122,8 +186,11 @@ enum MockCalendarFixtures {
                 notes: "Review grouped glass cards\nFigma: https://figma.com/file/mock-liquid-glass",
                 location: "Meeting Room 4B",
                 calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
                 calendarColorHex: workCalendar.colorHex,
-                rsvpStatus: .notResponded
+                rsvpStatus: .notResponded,
+                attendees: designReviewAttendees,
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-dentist",
@@ -134,8 +201,11 @@ enum MockCalendarFixtures {
                 notes: "Bring insurance card.",
                 location: "Mariahilfer Straße 88",
                 calendarTitle: personalCalendar.title,
+                calendarID: personalCalendar.id,
                 calendarColorHex: personalCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-focus",
@@ -146,8 +216,11 @@ enum MockCalendarFixtures {
                 notes: "No meetings. Deep work.",
                 location: "Home Office",
                 calendarTitle: personalCalendar.title,
+                calendarID: personalCalendar.id,
                 calendarColorHex: personalCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-offsite",
@@ -158,8 +231,11 @@ enum MockCalendarFixtures {
                 notes: "Two-day team offsite with roadmap planning.",
                 location: "Semmering",
                 calendarTitle: workCalendar.title,
+                calendarID: workCalendar.id,
                 calendarColorHex: workCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-flight",
@@ -170,8 +246,11 @@ enum MockCalendarFixtures {
                 notes: "Check in online 24h before departure.",
                 location: "VIE → BER",
                 calendarTitle: travelCalendar.title,
+                calendarID: travelCalendar.id,
                 calendarColorHex: travelCalendar.colorHex,
-                rsvpStatus: .accepted
+                rsvpStatus: .accepted,
+                attendees: [],
+                recurrenceDescription: nil
             ),
             CalendarEvent(
                 id: "mock-family-dinner",
@@ -182,8 +261,11 @@ enum MockCalendarFixtures {
                 notes: "Bring dessert.",
                 location: "Parents' House",
                 calendarTitle: personalCalendar.title,
+                calendarID: personalCalendar.id,
                 calendarColorHex: personalCalendar.colorHex,
-                rsvpStatus: .tentative
+                rsvpStatus: .tentative,
+                attendees: [],
+                recurrenceDescription: nil
             )
         ]
         .sorted(by: { $0.startDate < $1.startDate })
