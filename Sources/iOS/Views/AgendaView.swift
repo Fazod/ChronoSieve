@@ -11,28 +11,25 @@ struct AgendaView: View {
     @State private var showingRuleManager = false
     @State private var showingHiddenEvents = false
     @State private var showingCalendarPicker = false
-    @State private var selectedDate = Date()
+    @State private var selectedDate = Calendar.current.startOfDay(for: Date())
+    @State private var stickyCalendarHeight: CGFloat = 0
+    @State private var stickyDayHeaderHeight: CGFloat = 0
+    @State private var pendingScrollDate: Date?
+    @State private var isProgrammaticScroll = false
+
+    private let agendaScrollCoordinateSpace = "agenda-scroll"
 
     var body: some View {
         NavigationStack {
             ZStack {
                 appBackground
 
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        if viewModel.permissionDenied {
-                            permissionDeniedView
-                        } else {
-                            CalendarMonthView(
-                                events: viewModel.filteredEvents,
-                                selectedDate: $selectedDate
-                            )
-                            .padding(.top, -10)
-                            .padding(.bottom, 8)
-
-                            agendaSection
-                        }
+                if viewModel.permissionDenied {
+                    ScrollView(showsIndicators: false) {
+                        permissionDeniedView
                     }
+                } else {
+                    agendaScrollView
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -62,6 +59,95 @@ struct AgendaView: View {
             .onChange(of: rulesDigest) { _, _ in
                 syncRulesToViewModel()
             }
+        }
+    }
+
+    private var agendaScrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView(showsIndicators: false) {
+                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    ForEach(agendaDayGroups) { group in
+                        Section {
+                            AgendaDaySectionContent(events: group.events)
+                                .padding(.horizontal, 16)
+                                .background(sectionOffsetReader(for: group))
+                                .onAppear {
+                                    guard shouldPrefetchMore(for: group) else { return }
+                                    Task {
+                                        await viewModel.loadMoreIfNeeded(currentDay: group.day)
+                                    }
+                                }
+                        } header: {
+                            AgendaDaySectionHeader(
+                                date: group.day,
+                                showSeparator: group.id != agendaDayGroups.first?.id
+                            )
+                            .background {
+                                GeometryReader { proxy in
+                                    Color.clear
+                                        .preference(key: DayHeaderHeightPreferenceKey.self, value: proxy.size.height)
+                                }
+                            }
+                        }
+                        .id(group.id)
+                    }
+
+                    Color.clear
+                        .frame(height: 1)
+                        .onAppear {
+                            guard let lastDay = agendaDayGroups.last?.day else { return }
+                            Task {
+                                await viewModel.loadMoreIfNeeded(currentDay: lastDay)
+                            }
+                        }
+                }
+                .padding(.bottom, 112)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+            }
+            .coordinateSpace(name: agendaScrollCoordinateSpace)
+            .background(Color.black)
+            // Only the calendar lives in the top safe-area inset now. The per-day
+            // headers pin themselves (LazyVStack pinnedViews) directly below it,
+            // so there is exactly one header per day and no duplicate sticky copy.
+            .safeAreaInset(edge: .top, spacing: 0) {
+                stickyCalendarOverlay
+            }
+            .onPreferenceChange(DayHeaderHeightPreferenceKey.self) { height in
+                stickyDayHeaderHeight = height
+            }
+            .onPreferenceChange(AgendaDaySectionOffsetPreferenceKey.self) { offsets in
+                updateSelectedDateFromScroll(offsets)
+            }
+            .onChange(of: pendingScrollDate) { _, _ in
+                scrollToPendingDate(with: proxy)
+            }
+            .onChange(of: agendaDayGroupIDs) { _, _ in
+                scrollToPendingDate(with: proxy)
+            }
+        }
+    }
+
+    private var stickyCalendarOverlay: some View {
+        CalendarMonthView(
+            events: viewModel.filteredEvents,
+            selectedDate: calendarSelectionBinding
+        )
+        .padding(.top, -10)
+        .padding(.bottom, 8)
+        .background(Color(.systemBackground))
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color.primary.opacity(0.08))
+                .frame(height: 0.75)
+        }
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: ViewHeightPreferenceKey.self, value: proxy.size.height)
+            }
+        }
+        .onPreferenceChange(ViewHeightPreferenceKey.self) { height in
+            stickyCalendarHeight = height
         }
     }
 
@@ -145,44 +231,64 @@ struct AgendaView: View {
         .padding(.bottom, 32)
     }
 
-    private var agendaSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SelectedDayAgendaHeader(date: selectedDate)
-
-            if selectedDayEvents.isEmpty {
-                ContentUnavailableView(
-                    "No Events",
-                    systemImage: "calendar",
-                    description: Text("No matching events for this day.")
-                )
-                .frame(maxWidth: .infinity, minHeight: 180)
-            } else {
-                EventGroupView(events: selectedDayEvents, style: .agenda)
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 420, alignment: .topLeading)
-        .padding(.horizontal, 16)
-        .padding(.top, 20)
-        .padding(.bottom, 112)
-        .background(Color.black)
-        .environment(\.colorScheme, .dark)
-    }
-
     private var appBackground: some View {
         Color(.systemBackground)
             .ignoresSafeArea()
     }
 
-    private var selectedDayEvents: [CalendarEvent] {
+    private var calendarSelectionBinding: Binding<Date> {
+        Binding(
+            get: { selectedDate },
+            set: { newValue in
+                let normalized = Calendar.current.startOfDay(for: newValue)
+                selectedDate = normalized
+                pendingScrollDate = normalized
+
+                Task {
+                    await viewModel.ensureDateLoaded(normalized)
+                }
+            }
+        )
+    }
+
+    private var agendaDayGroupIDs: [String] {
+        agendaDayGroups.map(\.id)
+    }
+
+    private var agendaDayGroups: [AgendaDayGroup] {
         let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: selectedDate)
-        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else {
-            return []
+        let selectedDay = calendar.startOfDay(for: selectedDate)
+
+        guard let loadedInterval = viewModel.loadedInterval else {
+            return [
+                AgendaDayGroup(day: selectedDay, events: events(for: selectedDay))
+            ]
         }
 
-        return viewModel.filteredEvents
-            .filter { $0.startDate < endOfDay && $0.endDate > startOfDay }
-            .sorted(by: { $0.startDate < $1.startDate })
+        let startDay = calendar.startOfDay(for: loadedInterval.start)
+        let endDay = calendar.startOfDay(for: loadedInterval.end)
+
+        var groups: [AgendaDayGroup] = []
+        var cursor = startDay
+
+        while cursor < endDay {
+            let dayEvents = events(for: cursor)
+            if !dayEvents.isEmpty || calendar.isDate(cursor, inSameDayAs: selectedDay) {
+                groups.append(AgendaDayGroup(day: cursor, events: dayEvents))
+            }
+
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: cursor) else {
+                break
+            }
+
+            cursor = nextDay
+        }
+
+        if groups.isEmpty {
+            groups.append(AgendaDayGroup(day: selectedDay, events: []))
+        }
+
+        return groups
     }
 
     private var hiddenEvents: [CalendarEvent] {
@@ -224,21 +330,213 @@ struct AgendaView: View {
             assertionFailure("Failed to save rules: \(error)")
         }
     }
+
+    private func events(for day: Date) -> [CalendarEvent] {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: day)
+        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else {
+            return []
+        }
+
+        return viewModel.filteredEvents
+            .filter { $0.startDate < endOfDay && $0.endDate > startOfDay }
+            .sorted(by: { $0.startDate < $1.startDate })
+    }
+
+    private func shouldPrefetchMore(for group: AgendaDayGroup) -> Bool {
+        guard let index = agendaDayGroups.firstIndex(where: { $0.id == group.id }) else {
+            return false
+        }
+
+        return index >= max(agendaDayGroups.count - 3, 0)
+    }
+
+    private func sectionOffsetReader(for group: AgendaDayGroup) -> some View {
+        GeometryReader { proxy in
+            Color.clear
+                .preference(
+                    key: AgendaDaySectionOffsetPreferenceKey.self,
+                    value: [
+                        AgendaDaySectionOffset(
+                            id: group.id,
+                            day: group.day,
+                            minY: proxy.frame(in: .named(agendaScrollCoordinateSpace)).minY
+                        )
+                    ]
+                )
+        }
+    }
+
+    private func updateSelectedDateFromScroll(_ offsets: [AgendaDaySectionOffset]) {
+        // Ignore geometry churn caused by an in-flight programmatic scroll; the
+        // tapped date already drives `selectedDate` in that case.
+        guard !isProgrammaticScroll, pendingScrollDate == nil else {
+            return
+        }
+
+        // Content sits just below its pinned day header, so the active day is
+        // the one whose content top has passed under the pin line (roughly the
+        // header height) and is closest to it.
+        let threshold: CGFloat = (stickyDayHeaderHeight > 0 ? stickyDayHeaderHeight : 40) + 4
+        let sortedOffsets = offsets.sorted(by: { $0.minY < $1.minY })
+
+        let activeOffset = sortedOffsets
+            .filter { $0.minY <= threshold }
+            .max(by: { $0.minY < $1.minY })
+            ?? sortedOffsets.first
+
+        guard let activeOffset else {
+            return
+        }
+
+        let normalized = Calendar.current.startOfDay(for: activeOffset.day)
+        guard !Calendar.current.isDate(normalized, inSameDayAs: selectedDate) else {
+            return
+        }
+
+        selectedDate = normalized
+    }
+
+    private func scrollToPendingDate(with proxy: ScrollViewProxy) {
+        guard let pendingScrollDate else {
+            return
+        }
+
+        guard let targetGroup = targetAgendaGroup(for: pendingScrollDate) else {
+            return
+        }
+
+        // With the header in the top safe-area inset, anchoring to `.top` lands
+        // the section right below the header.
+        isProgrammaticScroll = true
+        withAnimation(.snappy(duration: 0.32, extraBounce: 0)) {
+            proxy.scrollTo(targetGroup.id, anchor: .top)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            self.pendingScrollDate = nil
+            self.isProgrammaticScroll = false
+        }
+    }
+
+    private func targetAgendaGroup(for date: Date) -> AgendaDayGroup? {
+        let calendar = Calendar.current
+        let normalized = calendar.startOfDay(for: date)
+
+        if let exactMatch = agendaDayGroups.first(where: { calendar.isDate($0.day, inSameDayAs: normalized) }) {
+            return exactMatch
+        }
+
+        if let nextMatch = agendaDayGroups.first(where: { $0.day >= normalized }) {
+            return nextMatch
+        }
+
+        return agendaDayGroups.last
+    }
+}
+
+private struct AgendaDayGroup: Identifiable, Equatable {
+    let day: Date
+    let events: [CalendarEvent]
+
+    var id: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: day)
+    }
+}
+
+private struct AgendaDaySectionOffset: Equatable {
+    let id: String
+    let day: Date
+    let minY: CGFloat
+}
+
+private struct AgendaDaySectionOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: [AgendaDaySectionOffset] = []
+
+    static func reduce(value: inout [AgendaDaySectionOffset], nextValue: () -> [AgendaDaySectionOffset]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+private struct ViewHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+private struct DayHeaderHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+private struct AgendaDaySectionHeader: View {
+    let date: Date
+    let showSeparator: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if showSeparator {
+                Rectangle()
+                    .fill(.white.opacity(0.14))
+                    .frame(height: 0.75)
+            }
+
+            SelectedDayAgendaHeader(date: date)
+                .padding(.horizontal, 16)
+                .padding(.top, showSeparator ? 6 : 8)
+                .padding(.bottom, 6)
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(Color.black)
+        .environment(\.colorScheme, .dark)
+    }
+}
+
+private struct AgendaDaySectionContent: View {
+    let events: [CalendarEvent]
+
+    var body: some View {
+        Group {
+            if events.isEmpty {
+                ContentUnavailableView(
+                    "No Events",
+                    systemImage: "calendar",
+                    description: Text("No matching events for this day.")
+                )
+                .frame(maxWidth: .infinity, minHeight: 140)
+            } else {
+                EventGroupView(events: events, style: .agenda)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding(.top, 6)
+        .padding(.bottom, 18)
+        .environment(\.colorScheme, .dark)
+    }
 }
 
 private struct SelectedDayAgendaHeader: View {
     let date: Date
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text(primaryTitle)
-                .font(.headline.weight(.bold))
+                .font(.subheadline.weight(.bold))
                 .textCase(.uppercase)
+                .tracking(0.2)
 
             Text(shortDate)
-                .font(.title3.weight(.regular))
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(.white.opacity(0.72))
         }
+        .lineLimit(1)
     }
 
     private var primaryTitle: String {

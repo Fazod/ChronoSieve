@@ -7,20 +7,25 @@ final class AgendaViewModel: ObservableObject {
     @Published private(set) var activeRules: [FilterRule] = []
     @Published private(set) var availableCalendars: [CalendarSource] = []
     @Published private(set) var enabledCalendarIDs: Set<String> = []
+    @Published private(set) var loadedInterval: DateInterval?
     @Published var permissionDenied = false
 
     private let calendarService: CalendarServiceProtocol
     private let watchSyncService: WatchSyncService
     private var filterEngine = RegexFilterEngine()
 
-    private let lookAheadDays = 45
+    private let initialLookAheadDays = 45
+    private let incrementalLookAheadDays = 30
+    private let prefetchThresholdDays = 7
     private let periodicRefreshInterval: TimeInterval = 15 * 60
     private let selectedCalendarIDsKey = "selectedCalendarIDs"
 
+    private var lookAheadDays = 45
     private var lastFetchedInterval: DateInterval?
     private var lastRefreshAt: Date?
     private var hasPendingStoreChange = false
     private var hasLoadedCalendarSelection = false
+    private var isExtendingLookAhead = false
     private var changeRefreshTask: Task<Void, Never>?
 
     init(
@@ -67,6 +72,7 @@ final class AgendaViewModel: ObservableObject {
             filteredEvents = []
             availableCalendars = []
             enabledCalendarIDs = []
+            loadedInterval = nil
             return
         }
 
@@ -83,6 +89,7 @@ final class AgendaViewModel: ObservableObject {
         }
 
         allEvents = await calendarService.fetchEvents(in: interval, calendarIDs: enabledCalendarIDs)
+        loadedInterval = interval
         lastFetchedInterval = interval
         lastRefreshAt = now
         hasPendingStoreChange = false
@@ -159,6 +166,51 @@ final class AgendaViewModel: ObservableObject {
     private func intervalsMatch(lhs: DateInterval, rhs: DateInterval) -> Bool {
         abs(lhs.start.timeIntervalSince(rhs.start)) < 1
             && abs(lhs.end.timeIntervalSince(rhs.end)) < 1
+    }
+
+    func ensureDateLoaded(_ date: Date) async {
+        let calendar = Calendar.autoupdatingCurrent
+        let today = calendar.startOfDay(for: Date())
+        let targetDay = calendar.startOfDay(for: date)
+        let dayDistance = calendar.dateComponents([.day], from: today, to: targetDay).day ?? 0
+        let requiredLookAheadDays = max(initialLookAheadDays, dayDistance + prefetchThresholdDays + 1)
+
+        guard requiredLookAheadDays > lookAheadDays else {
+            return
+        }
+
+        await extendLookAhead(toAtLeast: requiredLookAheadDays)
+    }
+
+    func loadMoreIfNeeded(currentDay: Date) async {
+        guard let loadedInterval else {
+            return
+        }
+
+        let calendar = Calendar.autoupdatingCurrent
+        let thresholdDate = calendar.date(byAdding: .day, value: -prefetchThresholdDays, to: loadedInterval.end)
+            ?? loadedInterval.end
+
+        guard calendar.startOfDay(for: currentDay) >= calendar.startOfDay(for: thresholdDate) else {
+            return
+        }
+
+        await extendLookAhead(toAtLeast: lookAheadDays + incrementalLookAheadDays)
+    }
+
+    private func extendLookAhead(toAtLeast minimumDays: Int) async {
+        guard !isExtendingLookAhead else {
+            return
+        }
+
+        guard minimumDays > lookAheadDays else {
+            return
+        }
+
+        isExtendingLookAhead = true
+        lookAheadDays = minimumDays
+        await refresh(force: true)
+        isExtendingLookAhead = false
     }
 
     private func makeFetchInterval(referenceDate: Date) -> DateInterval {
