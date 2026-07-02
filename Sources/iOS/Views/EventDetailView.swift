@@ -1,5 +1,3 @@
-import EventKit
-import EventKitUI
 import SwiftUI
 import UIKit
 
@@ -14,10 +12,7 @@ struct EventDetailView: View {
 
     @State private var showAllNotes = false
     @State private var showingCalendarPicker = false
-    @State private var showingRSVPEditor = false
-    @State private var showingRSVPPicker = false
     @State private var rsvpStatusOverride: RSVPStatus? = nil
-    @State private var rsvpEditEvent: EKEvent?
 
     // Optimistic local state — updates immediately when user picks a new calendar
     @State private var localCalendarTitle: String
@@ -58,6 +53,7 @@ struct EventDetailView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 20)
             }
+            .safeAreaInset(edge: .bottom) { rsvpBottomBar }
             .background(Color(.systemGroupedBackground))
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $showingCalendarPicker) {
@@ -71,20 +67,6 @@ struct EventDetailView: View {
                         Task { await viewModel.moveEvent(event, toCalendarID: selected.id) }
                     }
                 )
-            }
-            .navigationDestination(isPresented: $showingRSVPPicker) {
-                EventRSVPPickerView(
-                    currentStatus: displayedRSVPStatus,
-                    onSelect: { rsvpStatusOverride = $0 }
-                )
-            }
-            .navigationDestination(isPresented: $showingRSVPEditor) {
-                if let ekEvent = rsvpEditEvent {
-                    EKEventViewRepresentable(event: ekEvent)
-                        .navigationTitle(event.title)
-                        .navigationBarTitleDisplayMode(.inline)
-                        .ignoresSafeArea()
-                }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -237,10 +219,6 @@ struct EventDetailView: View {
 
     private var attendeesCardContent: some View {
         VStack(spacing: 0) {
-            rsvpResponseRow
-
-            Divider().padding(.leading, 16)
-
             ForEach(Array(event.attendees.enumerated()), id: \.element.id) { index, attendee in
                 AttendeeRow(attendee: attendee)
 
@@ -252,71 +230,42 @@ struct EventDetailView: View {
         }
     }
 
-    // MARK: – RSVP Row
-
-    private var rsvpResponseRow: some View {
-        Button {
-            openRSVPEditor()
-        } label: {
-            HStack {
-                Text("Your Response")
-                    .font(.body)
-                    .foregroundStyle(.primary)
-                Spacer()
-                HStack(spacing: 6) {
-                    rsvpStatusIcon(for: displayedRSVPStatus)
-                        .font(.body)
-                    Text(rsvpStatusLabel(for: displayedRSVPStatus))
-                        .foregroundStyle(.secondary)
-                }
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .padding(.leading, 4)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-        }
-        .buttonStyle(.plain)
-    }
+    // MARK: – RSVP Bottom Bar
 
     @ViewBuilder
-    private func rsvpStatusIcon(for status: RSVPStatus) -> some View {
-        switch status {
-        case .accepted:
-            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-        case .declined:
-            Image(systemName: "xmark.circle.fill").foregroundStyle(.red)
-        case .tentative:
-            Image(systemName: "questionmark.circle.fill").foregroundStyle(.orange)
-        case .notResponded, .unknown:
-            Image(systemName: "clock.circle").foregroundStyle(Color(.systemGray3))
+    private var rsvpBottomBar: some View {
+        if !event.attendees.isEmpty && !event.isCancelled {
+            VStack(spacing: 0) {
+                Divider()
+                HStack(spacing: 8) {
+                    rsvpBarButton(status: .accepted,  label: "Accept",  activeColor: .green)
+                    rsvpBarButton(status: .tentative, label: "Maybe",   activeColor: .orange)
+                    rsvpBarButton(status: .declined,  label: "Decline", activeColor: .red)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
+            }
+            .background(.regularMaterial)
         }
     }
 
-    private func rsvpStatusLabel(for status: RSVPStatus) -> String {
-        switch status {
-        case .accepted:     return "Accepted"
-        case .declined:     return "Declined"
-        case .tentative:    return "Maybe"
-        case .notResponded: return "Not Responded"
-        case .unknown:      return "Unknown"
+    private func rsvpBarButton(status: RSVPStatus, label: String, activeColor: Color) -> some View {
+        let isActive = (rsvpStatusOverride ?? event.rsvpStatus) == status
+        return Button {
+            withAnimation(.snappy(duration: 0.15)) {
+                rsvpStatusOverride = status
+            }
+        } label: {
+            Text(label)
+                .font(.body.weight(isActive ? .semibold : .regular))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(isActive ? activeColor : Color.clear)
+                .foregroundStyle(isActive ? .white : Color(.label))
+                .clipShape(Capsule())
         }
-    }
-
-    private var displayedRSVPStatus: RSVPStatus {
-        rsvpStatusOverride ?? event.rsvpStatus
-    }
-
-    private func openRSVPEditor() {
-        if let (_, ekEvent) = viewModel.rsvpEdit(for: event) {
-            // Real EventKit event — push EKEventViewController (shows native RSVP buttons)
-            rsvpEditEvent = ekEvent
-            showingRSVPEditor = true
-        } else {
-            // Mock / unsupported calendar — push custom SwiftUI picker
-            showingRSVPPicker = true
-        }
+        .buttonStyle(.plain)
     }
 
     // MARK: – Calendar Info Card
@@ -593,52 +542,6 @@ private struct AttendeeAvatar: View {
                 .font(.system(size: 7.5, weight: .black))
                 .foregroundStyle(.white)
         }
-    }
-}
-
-// MARK: - RSVP Picker (push destination inside EventDetailView's NavigationStack)
-
-private struct EventRSVPPickerView: View {
-    let currentStatus: RSVPStatus
-    let onSelect: (RSVPStatus) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-
-    private let options: [(status: RSVPStatus, label: String, icon: String, color: Color)] = [
-        (.accepted,  "Accept",  "checkmark.circle.fill",   .green),
-        (.tentative, "Maybe",   "questionmark.circle.fill", .orange),
-        (.declined,  "Decline", "xmark.circle.fill",        .red),
-    ]
-
-    var body: some View {
-        List {
-            ForEach(options, id: \.status) { option in
-                Button {
-                    onSelect(option.status)
-                    dismiss()
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: option.icon)
-                            .foregroundStyle(option.color)
-                            .font(.body)
-
-                        Text(option.label)
-                            .foregroundStyle(.primary)
-
-                        Spacer()
-
-                        if currentStatus == option.status {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(.blue)
-                                .fontWeight(.semibold)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .navigationTitle("Your Response")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
