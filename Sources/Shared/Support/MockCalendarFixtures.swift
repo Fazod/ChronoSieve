@@ -1,10 +1,10 @@
 import Foundation
 
 enum MockCalendarFixtures {
-    static let workCalendar = CalendarSource(id: "mock-work", title: "Calendar", colorHex: "#3B82F6")
-    static let personalCalendar = CalendarSource(id: "mock-personal", title: "Personal", colorHex: "#22C55E")
-    static let birthdaysCalendar = CalendarSource(id: "mock-birthdays", title: "Birthdays", colorHex: "#8B5CF6")
-    static let travelCalendar = CalendarSource(id: "mock-travel", title: "Travel", colorHex: "#F97316")
+    static let workCalendar      = CalendarSource(id: "mock-work",      title: "Calendar",  colorHex: "#3B82F6", accountTitle: "Exchange")
+    static let personalCalendar   = CalendarSource(id: "mock-personal",   title: "Personal",  colorHex: "#22C55E", accountTitle: "iCloud")
+    static let birthdaysCalendar  = CalendarSource(id: "mock-birthdays",  title: "Birthdays", colorHex: "#8B5CF6", accountTitle: "iCloud")
+    static let travelCalendar     = CalendarSource(id: "mock-travel",     title: "Travel",    colorHex: "#F97316", accountTitle: "iCloud")
 
     static func calendars() -> [CalendarSource] {
         [workCalendar, personalCalendar, birthdaysCalendar, travelCalendar]

@@ -75,10 +75,31 @@ final class CalendarService: CalendarServiceProtocol {
                 CalendarSource(
                     id: $0.calendarIdentifier,
                     title: $0.title,
-                    colorHex: UIColor(cgColor: $0.cgColor).hexString
+                    colorHex: UIColor(cgColor: $0.cgColor).hexString,
+                    accountTitle: resolvedAccountTitle(for: $0)
                 )
             }
             .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    }
+
+    private func resolvedAccountTitle(for calendar: EKCalendar) -> String {
+        guard let source = calendar.source else {
+            return fallbackAccountLabel(type: nil)
+        }
+        let title = source.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return title.isEmpty ? fallbackAccountLabel(type: source.sourceType) : title
+    }
+
+    private func fallbackAccountLabel(type sourceType: EKSourceType?) -> String {
+        switch sourceType {
+        case .local:      return "On My iPhone"
+        case .exchange:   return "Exchange"
+        case .mobileMe:   return "iCloud"
+        case .calDAV:     return "CalDAV"
+        case .subscribed: return "Subscribed"
+        case .birthdays:  return "Birthdays"
+        default:          return "Other"
+        }
     }
 
     func fetchEvents(in interval: DateInterval, calendarIDs: Set<String>) async -> [CalendarEvent] {

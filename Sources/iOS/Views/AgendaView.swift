@@ -968,25 +968,12 @@ private struct CalendarPickerView: View {
                         description: Text("No event calendars are currently available.")
                     )
                 } else {
-                    ForEach(calendars) { calendar in
-                        Button {
-                            toggle(calendar.id)
-                        } label: {
-                            HStack(spacing: 10) {
-                                Circle()
-                                    .fill(Color(hex: calendar.colorHex))
-                                    .frame(width: 10, height: 10)
-
-                                Text(calendar.title)
-                                    .foregroundStyle(.primary)
-
-                                Spacer()
-
-                                Image(systemName: selectedIDs.contains(calendar.id) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(selectedIDs.contains(calendar.id) ? Color.accentColor : Color.secondary)
+                    ForEach(groupedCalendars, id: \.account) { group in
+                        Section(group.account) {
+                            ForEach(group.calendars) { calendar in
+                                calendarRow(calendar)
                             }
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -1013,6 +1000,40 @@ private struct CalendarPickerView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func calendarRow(_ calendar: CalendarSource) -> some View {
+        Button {
+            toggle(calendar.id)
+        } label: {
+            HStack(spacing: 10) {
+                Circle()
+                    .fill(Color(hex: calendar.colorHex))
+                    .frame(width: 10, height: 10)
+
+                Text(calendar.title)
+                    .foregroundStyle(.primary)
+
+                Spacer()
+
+                Image(systemName: selectedIDs.contains(calendar.id) ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(selectedIDs.contains(calendar.id) ? Color.accentColor : Color.secondary)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Calendars grouped by account name and sorted alphabetically within each group.
+    private var groupedCalendars: [(account: String, calendars: [CalendarSource])] {
+        let grouped = Dictionary(grouping: calendars) { $0.accountTitle }
+        return grouped.keys
+            .sorted()
+            .map { account in
+                let sorted = grouped[account, default: []]
+                    .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+                return (account: account, calendars: sorted)
+            }
     }
 
     private func toggle(_ id: String) {
