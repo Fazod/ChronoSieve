@@ -508,7 +508,10 @@ struct AgendaView: View {
             return nextMatch
         }
 
-        return agendaDayGroups.last
+        // Return nil – not found in the currently loaded range.
+        // scrollToPendingDate will retry when agendaDayGroupIDs changes
+        // (i.e. once ensureDateLoaded has fetched events for that period).
+        return nil
     }
 }
 
@@ -1043,15 +1046,16 @@ struct CalendarMonthView: View {
     let events: [CalendarEvent]
     @Binding var selectedDate: Date
 
-    /// Total number of paged months available for swiping (±24 months around today).
-    private static let totalPages = 49
+    /// Total number of paged months available for swiping (±120 months / ±10 years around today).
+    private static let totalPages = 241
     /// Index of the page that corresponds to today's month.
-    private static let centerPage = 24
+    private static let centerPage = 120
 
     @State private var pageIndex: Int
     /// First day of the month that was current when this view was initialised
     /// (i.e. today's month). Used as the fixed reference for page offsets.
     @State private var anchorMonth: Date
+    @State private var showingMonthYearPicker = false
 
     init(events: [CalendarEvent], selectedDate: Binding<Date>) {
         self.events = events
@@ -1075,7 +1079,8 @@ struct CalendarMonthView: View {
             month: anchorMonth,
             events: [],
             selectedDate: anchorMonth,
-            onSelect: { _ in }
+            onSelect: { _ in },
+            onMonthYearTap: {}
         )
         .opacity(0)
         .allowsHitTesting(false)
@@ -1086,7 +1091,8 @@ struct CalendarMonthView: View {
                         month: monthDate(for: idx),
                         events: events,
                         selectedDate: selectedDate,
-                        onSelect: { selectedDate = $0 }
+                        onSelect: { selectedDate = $0 },
+                        onMonthYearTap: { showingMonthYearPicker = true }
                     )
                     .tag(idx)
                 }
@@ -1098,6 +1104,9 @@ struct CalendarMonthView: View {
         }
         .onChange(of: selectedDate) { _, newDate in
             syncPageIndex(for: newDate)
+        }
+        .sheet(isPresented: $showingMonthYearPicker) {
+            MonthYearPickerSheet(selectedDate: $selectedDate)
         }
     }
 
@@ -1146,22 +1155,32 @@ private struct MonthPageContent: View {
     let events: [CalendarEvent]
     let selectedDate: Date
     let onSelect: (Date) -> Void
+    var onMonthYearTap: () -> Void = {}
 
     private let weekdaySymbols = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
     var body: some View {
         VStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(monthName)
-                        .font(.title.weight(.bold))
-                        .foregroundStyle(.primary)
+                Button(action: onMonthYearTap) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(monthName)
+                            .font(.title.weight(.bold))
+                            .foregroundStyle(.primary)
 
-                    Text(yearString)
-                        .font(.title.weight(.regular))
-                        .foregroundStyle(.red)
+                        Text(yearString)
+                            .font(.title.weight(.regular))
+                            .foregroundStyle(.red)
+
+                        Image(systemName: "chevron.down")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, 2)
+                    }
+                    .minimumScaleFactor(0.8)
+                    .contentShape(Rectangle())
                 }
-                .minimumScaleFactor(0.8)
+                .buttonStyle(.plain)
 
                 HStack(spacing: 0) {
                     ForEach(weekdaySymbols, id: \.self) { day in
@@ -1381,6 +1400,87 @@ struct CalendarDayCell: View {
         }
 
         return .secondary.opacity(0.55)
+    }
+}
+
+// MARK: - Month / Year Quick-Jump Picker
+
+private struct MonthYearPickerSheet: View {
+    @Binding var selectedDate: Date
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var pickedMonth: Int
+    @State private var pickedYear: Int
+
+    private let monthNames: [String]
+    private let years: [Int]
+
+    init(selectedDate: Binding<Date>) {
+        _selectedDate = selectedDate
+        let cal   = Calendar.current
+        let month = cal.component(.month, from: selectedDate.wrappedValue)
+        let year  = cal.component(.year,  from: selectedDate.wrappedValue)
+        _pickedMonth = State(initialValue: month)
+        _pickedYear  = State(initialValue: year)
+
+        let formatter  = DateFormatter()
+        monthNames     = formatter.monthSymbols
+
+        let currentYear = cal.component(.year, from: Date())
+        years = Array((currentYear - 10)...(currentYear + 10))
+    }
+
+    var body: some View {
+        NavigationStack {
+            HStack(spacing: 0) {
+                Picker("Month", selection: $pickedMonth) {
+                    ForEach(1...12, id: \.self) { m in
+                        Text(monthNames[m - 1]).tag(m)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .clipped()
+
+                Picker("Year", selection: $pickedYear) {
+                    ForEach(years, id: \.self) { y in
+                        Text(verbatim: String(y)).tag(y)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .clipped()
+            }
+            .navigationTitle("Go to Month")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Go") {
+                        navigate()
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.height(280)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func navigate() {
+        let cal        = Calendar.current
+        let currentDay = cal.component(.day, from: selectedDate)
+        var comps      = DateComponents()
+        comps.year     = pickedYear
+        comps.month    = pickedMonth
+        comps.day      = 1
+        guard let firstOfMonth = cal.date(from: comps) else { return }
+        let daysInMonth = cal.range(of: .day, in: .month, for: firstOfMonth)!.count
+        comps.day = min(currentDay, daysInMonth)
+        if let newDate = cal.date(from: comps) {
+            selectedDate = newDate
+        }
     }
 }
 
