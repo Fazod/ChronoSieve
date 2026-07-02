@@ -8,6 +8,7 @@ protocol CalendarServiceProtocol {
     func fetchCalendars() async -> [CalendarSource]
     func fetchEvents(in interval: DateInterval, calendarIDs: Set<String>) async -> [CalendarEvent]
     func moveEvent(_ eventID: String, toCalendarID calendarID: String) async throws
+    func prepareRSVPEdit(for eventID: String) -> (store: EKEventStore, event: EKEvent)?
     func setChangeHandler(_ handler: @escaping () -> Void)
 }
 
@@ -16,6 +17,10 @@ final class CalendarService: CalendarServiceProtocol {
     private let eventStore = EKEventStore()
     private var changeHandler: (() -> Void)?
     private var eventStoreObserver: NSObjectProtocol?
+    /// Maps our stable CalendarEvent.id → the live EKEvent retained from the last fetch.
+    /// Used by prepareRSVPEdit — avoids re-looking-up by identifier, which is unreliable
+    /// for Exchange / CalDAV events.
+    private var eventLookup: [String: EKEvent] = [:]
 
     init() {
         eventStoreObserver = NotificationCenter.default.addObserver(
@@ -124,6 +129,7 @@ final class CalendarService: CalendarServiceProtocol {
 
         let events = eventStore.events(matching: predicate)
         var uniqueEvents: [String: CalendarEvent] = [:]
+        var lookup: [String: EKEvent] = [:]
 
         for event in events {
             guard let mapped = mapEvent(event, visibleInterval: interval) else {
@@ -133,12 +139,15 @@ final class CalendarService: CalendarServiceProtocol {
             if let existing = uniqueEvents[mapped.id] {
                 if mapped.startDate < existing.startDate {
                     uniqueEvents[mapped.id] = mapped
+                    lookup[mapped.id] = event
                 }
             } else {
                 uniqueEvents[mapped.id] = mapped
+                lookup[mapped.id] = event
             }
         }
 
+        eventLookup = lookup
         return uniqueEvents.values.sorted { $0.startDate < $1.startDate }
     }
 
@@ -164,6 +173,11 @@ final class CalendarService: CalendarServiceProtocol {
         // For recurring events change the whole series; single events use thisEvent
         let span: EKSpan = (ekEvent.recurrenceRules?.isEmpty == false) ? .futureEvents : .thisEvent
         try eventStore.save(ekEvent, span: span, commit: true)
+    }
+
+    func prepareRSVPEdit(for eventID: String) -> (store: EKEventStore, event: EKEvent)? {
+        guard let ekEvent = eventLookup[eventID] else { return nil }
+        return (eventStore, ekEvent)
     }
 
     private func makeExpandedQueryInterval(from interval: DateInterval) -> DateInterval {

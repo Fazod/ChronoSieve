@@ -1,3 +1,5 @@
+import EventKit
+import EventKitUI
 import SwiftUI
 import UIKit
 
@@ -12,6 +14,11 @@ struct EventDetailView: View {
 
     @State private var showAllNotes = false
     @State private var showingCalendarPicker = false
+    @State private var showingRSVPEditor = false
+    @State private var showingRSVPPicker = false
+    @State private var rsvpStatusOverride: RSVPStatus? = nil
+    @State private var rsvpEditStore: EKEventStore?
+    @State private var rsvpEditEvent: EKEvent?
 
     // Optimistic local state — updates immediately when user picks a new calendar
     @State private var localCalendarTitle: String
@@ -65,6 +72,20 @@ struct EventDetailView: View {
                         Task { await viewModel.moveEvent(event, toCalendarID: selected.id) }
                     }
                 )
+            }
+            .navigationDestination(isPresented: $showingRSVPPicker) {
+                EventRSVPPickerView(
+                    currentStatus: displayedRSVPStatus,
+                    onSelect: { rsvpStatusOverride = $0 }
+                )
+            }
+            .sheet(isPresented: $showingRSVPEditor) {
+                if let store = rsvpEditStore, let ekEvent = rsvpEditEvent {
+                    EKEventEditRepresentable(eventStore: store, event: ekEvent) {
+                        showingRSVPEditor = false
+                    }
+                    .ignoresSafeArea()
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -217,6 +238,10 @@ struct EventDetailView: View {
 
     private var attendeesCardContent: some View {
         VStack(spacing: 0) {
+            rsvpResponseRow
+
+            Divider().padding(.leading, 16)
+
             ForEach(Array(event.attendees.enumerated()), id: \.element.id) { index, attendee in
                 AttendeeRow(attendee: attendee)
 
@@ -225,6 +250,74 @@ struct EventDetailView: View {
                     Divider().padding(.leading, 16 + 44 + 12)
                 }
             }
+        }
+    }
+
+    // MARK: – RSVP Row
+
+    private var rsvpResponseRow: some View {
+        Button {
+            openRSVPEditor()
+        } label: {
+            HStack {
+                Text("Your Response")
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                Spacer()
+                HStack(spacing: 6) {
+                    rsvpStatusIcon(for: displayedRSVPStatus)
+                        .font(.body)
+                    Text(rsvpStatusLabel(for: displayedRSVPStatus))
+                        .foregroundStyle(.secondary)
+                }
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .padding(.leading, 4)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func rsvpStatusIcon(for status: RSVPStatus) -> some View {
+        switch status {
+        case .accepted:
+            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+        case .declined:
+            Image(systemName: "xmark.circle.fill").foregroundStyle(.red)
+        case .tentative:
+            Image(systemName: "questionmark.circle.fill").foregroundStyle(.orange)
+        case .notResponded, .unknown:
+            Image(systemName: "clock.circle").foregroundStyle(Color(.systemGray3))
+        }
+    }
+
+    private func rsvpStatusLabel(for status: RSVPStatus) -> String {
+        switch status {
+        case .accepted:     return "Accepted"
+        case .declined:     return "Declined"
+        case .tentative:    return "Maybe"
+        case .notResponded: return "Not Responded"
+        case .unknown:      return "Unknown"
+        }
+    }
+
+    private var displayedRSVPStatus: RSVPStatus {
+        rsvpStatusOverride ?? event.rsvpStatus
+    }
+
+    private func openRSVPEditor() {
+        if let (store, ekEvent) = viewModel.rsvpEdit(for: event) {
+            // Real EventKit event — open system edit view (sends response to server)
+            rsvpEditStore = store
+            rsvpEditEvent = ekEvent
+            showingRSVPEditor = true
+        } else {
+            // Mock / unsupported calendar — fall back to local picker
+            showingRSVPPicker = true
         }
     }
 
@@ -502,6 +595,52 @@ private struct AttendeeAvatar: View {
                 .font(.system(size: 7.5, weight: .black))
                 .foregroundStyle(.white)
         }
+    }
+}
+
+// MARK: - RSVP Picker (push destination inside EventDetailView's NavigationStack)
+
+private struct EventRSVPPickerView: View {
+    let currentStatus: RSVPStatus
+    let onSelect: (RSVPStatus) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    private let options: [(status: RSVPStatus, label: String, icon: String, color: Color)] = [
+        (.accepted,  "Accept",  "checkmark.circle.fill",   .green),
+        (.tentative, "Maybe",   "questionmark.circle.fill", .orange),
+        (.declined,  "Decline", "xmark.circle.fill",        .red),
+    ]
+
+    var body: some View {
+        List {
+            ForEach(options, id: \.status) { option in
+                Button {
+                    onSelect(option.status)
+                    dismiss()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: option.icon)
+                            .foregroundStyle(option.color)
+                            .font(.body)
+
+                        Text(option.label)
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        if currentStatus == option.status {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.blue)
+                                .fontWeight(.semibold)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .navigationTitle("Your Response")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

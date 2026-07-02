@@ -18,13 +18,14 @@
 		3EBE38906DCB103D731F232B /* WatchConnectivityReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */; };
 		41F16949A5D2D2B5A82AD551 /* RegexFilterEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */; };
 		42AB290C21B57D37A2130547 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF043204E6CBF4120E385587 /* EventDetailView.swift */; };
+		47522F1CFEE95C924E005E34 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AD89C0DFC9F34CC7B57F5E /* ContactsService.swift */; };
 		4B0B1B825460D287DF543498 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1B62E00FBDF38347DC994D /* NotificationNames.swift */; };
 		4F00F235970295DE8C9755BF /* ChronoSieveWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */; };
 		539D95640D77839D6F289335 /* WatchAgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */; };
+		54ED18749C32EC81E71284F1 /* EKEventEditRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD18E7F93E70FA7BCA3D28F6 /* EKEventEditRepresentable.swift */; };
 		56887D7EA34A736DDC5B07DA /* AgendaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74321E5BC0986716ED5E1047 /* AgendaViewModel.swift */; };
 		5ED0DEF5BB535FC6D9D52163 /* RuntimeEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821638FABA765E98C992F496 /* RuntimeEnvironment.swift */; };
 		6313022C2F3B9BF4886047FA /* MockCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DA2FA91BA0451C38DB188B /* MockCalendarService.swift */; };
-		E7F8A0123456789ABCDE1234 /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2A3B8E7D1405C692FA034B /* ContactsService.swift */; };
 		69639BCB8F7822CFC7BD6C12 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008374DEF4E357B2D44D92E /* CalendarEvent.swift */; };
 		69E160C5DD744785561359C9 /* RegexFilterEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */; };
 		7AFAA17CA7288953F51EAFB2 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811E1274ED18EAE41A4FAB3F /* CalendarService.swift */; };
@@ -61,7 +62,7 @@
 
 /* Begin PBXFileReference section */
 		06643D45E899BB335D56D0D9 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
-		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaSnapshot.swift; sourceTree = "<group>"; };
 		48BD99690E8710D99FBFF96D /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
 		4DF3798727C1DA99D985DDD3 /* FilterRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRule.swift; sourceTree = "<group>"; };
@@ -70,9 +71,8 @@
 		5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRulesView.swift; sourceTree = "<group>"; };
 		64383037FF88A167D41F4873 /* ChronoSieveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveUITests.swift; sourceTree = "<group>"; };
 		656DC1DE31C305005B7089C3 /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
-		CF2A3B8E7D1405C692FA034B /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
 		6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityReceiver.swift; sourceTree = "<group>"; };
-		6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoSieve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ChronoSieve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74321E5BC0986716ED5E1047 /* AgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaViewModel.swift; sourceTree = "<group>"; };
 		76119AA9E83004428270632C /* FilterRuleRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRuleRecord.swift; sourceTree = "<group>"; };
 		8003747F52A24B8A3043D9BD /* ChronoSieveWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoSieveWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,10 +83,12 @@
 		89CAF70713B2F04DA7AA7242 /* AgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaView.swift; sourceTree = "<group>"; };
 		8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexFilterEngineTests.swift; sourceTree = "<group>"; };
 		923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveWatchApp.swift; sourceTree = "<group>"; };
-		93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChronoSieveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexFilterEngine.swift; sourceTree = "<group>"; };
 		A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaViewModel.swift; sourceTree = "<group>"; };
 		A42B4D5D2DF128083900C6DA /* MockCalendarFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCalendarFixtures.swift; sourceTree = "<group>"; };
+		A7AD89C0DFC9F34CC7B57F5E /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
+		CD18E7F93E70FA7BCA3D28F6 /* EKEventEditRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKEventEditRepresentable.swift; sourceTree = "<group>"; };
 		D7EF259B53EA48503BC6A730 /* WatchAgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaView.swift; sourceTree = "<group>"; };
 		FF043204E6CBF4120E385587 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -104,7 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				811E1274ED18EAE41A4FAB3F /* CalendarService.swift */,
-				CF2A3B8E7D1405C692FA034B /* ContactsService.swift */,
+				A7AD89C0DFC9F34CC7B57F5E /* ContactsService.swift */,
 				82DA2FA91BA0451C38DB188B /* MockCalendarService.swift */,
 				656DC1DE31C305005B7089C3 /* WatchSyncService.swift */,
 			);
@@ -136,6 +138,7 @@
 			children = (
 				89CAF70713B2F04DA7AA7242 /* AgendaView.swift */,
 				48BD99690E8710D99FBFF96D /* DayView.swift */,
+				CD18E7F93E70FA7BCA3D28F6 /* EKEventEditRepresentable.swift */,
 				FF043204E6CBF4120E385587 /* EventDetailView.swift */,
 				5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */,
 			);
@@ -348,7 +351,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2660;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					4FD2619C27E97A9167E01FC8 = {
 						DevelopmentTeam = Y9ARKG2EC6;
@@ -360,6 +363,7 @@
 						ProvisioningStyle = Automatic;
 					};
 					B91AA1FD5C82381A29345420 = {
+						DevelopmentTeam = Y9ARKG2EC6;
 						ProvisioningStyle = Automatic;
 					};
 					D679A99A6723E0F057618E0C = {
@@ -408,10 +412,11 @@
 				56887D7EA34A736DDC5B07DA /* AgendaViewModel.swift in Sources */,
 				69639BCB8F7822CFC7BD6C12 /* CalendarEvent.swift in Sources */,
 				7AFAA17CA7288953F51EAFB2 /* CalendarService.swift in Sources */,
-				E7F8A0123456789ABCDE1234 /* ContactsService.swift in Sources */,
 				323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */,
 				A8C466239400616DBE2DE4B7 /* ChronoSieveApp.swift in Sources */,
+				47522F1CFEE95C924E005E34 /* ContactsService.swift in Sources */,
 				1C0AC699CFBA1DAA85DFB0B9 /* DayView.swift in Sources */,
+				54ED18749C32EC81E71284F1 /* EKEventEditRepresentable.swift in Sources */,
 				42AB290C21B57D37A2130547 /* EventDetailView.swift in Sources */,
 				3B39D654E4E2A9266F61793B /* FilterRule.swift in Sources */,
 				83FEEFEA91807A83762CD2A4 /* FilterRuleRecord.swift in Sources */,
@@ -573,12 +578,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -598,7 +601,6 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.1;
@@ -628,7 +630,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				INFOPLIST_FILE = Resources/watchOS/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.watch;
 				SDKROOT = watchos;
@@ -642,7 +643,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				INFOPLIST_FILE = Resources/watchOS/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.watch;
 				SDKROOT = watchos;
@@ -705,12 +705,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -723,7 +721,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.1;

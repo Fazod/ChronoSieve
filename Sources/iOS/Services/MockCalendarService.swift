@@ -1,3 +1,4 @@
+import EventKit
 import Foundation
 
 @MainActor
@@ -28,6 +29,11 @@ final class MockCalendarService: CalendarServiceProtocol {
 
     func moveEvent(_ eventID: String, toCalendarID calendarID: String) async throws {
         // No-op in mock — live data refreshes on next fetch
+    }
+
+    func prepareRSVPEdit(for eventID: String) -> (store: EKEventStore, event: EKEvent)? {
+        // Mock has no real EventStore — RSVP editing not supported in previews
+        return nil
     }
 
     func setChangeHandler(_ handler: @escaping () -> Void) {

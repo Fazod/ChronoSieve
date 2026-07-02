@@ -1,3 +1,4 @@
+import EventKit
 import Foundation
 
 @MainActor
@@ -63,6 +64,10 @@ final class AgendaViewModel: ObservableObject {
             // Event store will fire a change notification on its own if something
             // else caused a refresh; silently ignore move errors for now.
         }
+    }
+
+    func rsvpEdit(for event: CalendarEvent) -> (EKEventStore, EKEvent)? {
+        calendarService.prepareRSVPEdit(for: event.id)
     }
 
     func updateEnabledCalendars(_ ids: Set<String>) {
