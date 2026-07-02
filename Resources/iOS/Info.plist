@@ -24,6 +24,8 @@
 	<string>ChronoSieve needs full access to your calendars to read and filter your events.</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>ChronoSieve needs access to your calendars to filter and display events.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>ChronoSieve uses your contacts to show photos of event attendees.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

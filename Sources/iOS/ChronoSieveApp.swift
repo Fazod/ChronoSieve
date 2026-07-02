@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct ChronoSieveApp: App {
     @StateObject private var viewModel: AgendaViewModel
+    @StateObject private var contactsService = ContactsService()
 
     private let isUITesting: Bool
 
@@ -15,6 +16,10 @@ struct ChronoSieveApp: App {
     var body: some Scene {
         WindowGroup {
             AgendaView(viewModel: viewModel)
+                .environmentObject(contactsService)
+                .task {
+                    await contactsService.requestAccess()
+                }
         }
         .modelContainer(for: [FilterRuleRecord.self], inMemory: isUITesting)
     }

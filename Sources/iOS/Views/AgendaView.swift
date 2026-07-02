@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct AgendaView: View {
     @ObservedObject var viewModel: AgendaViewModel
@@ -820,19 +821,33 @@ private struct MiniAttendeeAvatar: View {
     let attendee: Attendee
     private let size: CGFloat = 20
 
+    @EnvironmentObject private var contactsService: ContactsService
+    @State private var contactPhoto: UIImage?
+
     var body: some View {
         ZStack {
             Circle()
                 .fill(Color.black)
                 .frame(width: size + 2, height: size + 2)
 
-            Circle()
-                .fill(avatarColor)
-                .frame(width: size, height: size)
+            if let photo = contactPhoto {
+                Image(uiImage: photo)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
+                    .clipShape(Circle())
+            } else {
+                Circle()
+                    .fill(avatarColor)
+                    .frame(width: size, height: size)
 
-            Text(attendee.initials)
-                .font(.system(size: 7, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                Text(attendee.initials)
+                    .font(.system(size: 7, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+        }
+        .task(id: attendee.id) {
+            contactPhoto = await contactsService.photo(for: attendee)
         }
     }
 

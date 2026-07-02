@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Event Detail Sheet
 
@@ -428,17 +429,30 @@ private struct AttendeeRow: View {
 private struct AttendeeAvatar: View {
     let attendee: Attendee
 
+    @EnvironmentObject private var contactsService: ContactsService
+    @State private var contactPhoto: UIImage?
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             Circle()
                 .fill(avatarColor)
 
-            Text(attendee.initials)
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+            if let photo = contactPhoto {
+                Image(uiImage: photo)
+                    .resizable()
+                    .scaledToFill()
+                    .clipShape(Circle())
+            } else {
+                Text(attendee.initials)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
 
             rsvpBadge
                 .offset(x: 3, y: 3)
+        }
+        .task(id: attendee.id) {
+            contactPhoto = await contactsService.photo(for: attendee)
         }
     }
 
@@ -551,4 +565,5 @@ private extension Color {
 #Preview {
     EventDetailView(event: MockCalendarFixtures.events().first(where: { $0.id == "mock-standup" })!)
         .environmentObject(AgendaViewModel(calendarService: MockCalendarService()))
+        .environmentObject(ContactsService())
 }
