@@ -1043,6 +1043,110 @@ struct CalendarMonthView: View {
     let events: [CalendarEvent]
     @Binding var selectedDate: Date
 
+    /// Total number of paged months available for swiping (±24 months around today).
+    private static let totalPages = 49
+    /// Index of the page that corresponds to today's month.
+    private static let centerPage = 24
+
+    @State private var pageIndex: Int
+    /// First day of the month that was current when this view was initialised
+    /// (i.e. today's month). Used as the fixed reference for page offsets.
+    @State private var anchorMonth: Date
+
+    init(events: [CalendarEvent], selectedDate: Binding<Date>) {
+        self.events = events
+        self._selectedDate = selectedDate
+
+        let cal        = Calendar.current
+        let todayMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date()))!
+        let selMonth   = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate.wrappedValue))!
+        let diff       = cal.dateComponents([.month], from: todayMonth, to: selMonth).month ?? 0
+        let page       = max(0, min(Self.totalPages - 1, Self.centerPage + diff))
+
+        self._pageIndex   = State(initialValue: page)
+        self._anchorMonth = State(initialValue: todayMonth)
+    }
+
+    var body: some View {
+        // An invisible reference page establishes the natural height so the
+        // TabView – which has no intrinsic vertical size on its own – fills the
+        // correct space without an explicit frame.
+        MonthPageContent(
+            month: anchorMonth,
+            events: [],
+            selectedDate: anchorMonth,
+            onSelect: { _ in }
+        )
+        .opacity(0)
+        .allowsHitTesting(false)
+        .overlay {
+            TabView(selection: $pageIndex) {
+                ForEach(0..<Self.totalPages, id: \.self) { idx in
+                    MonthPageContent(
+                        month: monthDate(for: idx),
+                        events: events,
+                        selectedDate: selectedDate,
+                        onSelect: { selectedDate = $0 }
+                    )
+                    .tag(idx)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+        .onChange(of: pageIndex) { _, newPage in
+            syncSelectedDate(for: newPage)
+        }
+        .onChange(of: selectedDate) { _, newDate in
+            syncPageIndex(for: newDate)
+        }
+    }
+
+    // MARK: Helpers
+
+    private func monthDate(for idx: Int) -> Date {
+        let delta = idx - Self.centerPage
+        return Calendar.current.date(byAdding: .month, value: delta, to: anchorMonth) ?? anchorMonth
+    }
+
+    /// User swiped to a new month page: move `selectedDate` to the same
+    /// day-of-month in the new month (clamped) so the agenda follows.
+    private func syncSelectedDate(for page: Int) {
+        let cal      = Calendar.current
+        let newMonth = monthDate(for: page)
+        let curMonth = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate))!
+        guard !cal.isDate(newMonth, equalTo: curMonth, toGranularity: .month) else { return }
+
+        let day         = cal.component(.day, from: selectedDate)
+        let daysInMonth = cal.range(of: .day, in: .month, for: newMonth)!.count
+        var comps       = cal.dateComponents([.year, .month], from: newMonth)
+        comps.day       = min(day, daysInMonth)
+        if let newDate  = cal.date(from: comps) {
+            selectedDate = newDate
+        }
+    }
+
+    /// `selectedDate` changed externally (agenda scroll, "Today" tap, day tap):
+    /// snap the pager to the corresponding month.
+    private func syncPageIndex(for date: Date) {
+        let cal      = Calendar.current
+        let newMonth = cal.date(from: cal.dateComponents([.year, .month], from: date))!
+        let diff     = cal.dateComponents([.month], from: anchorMonth, to: newMonth).month ?? 0
+        let page     = max(0, min(Self.totalPages - 1, Self.centerPage + diff))
+        guard page != pageIndex else { return }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            pageIndex = page
+        }
+    }
+}
+
+// MARK: - Month Page Content
+
+private struct MonthPageContent: View {
+    let month: Date
+    let events: [CalendarEvent]
+    let selectedDate: Date
+    let onSelect: (Date) -> Void
+
     private let weekdaySymbols = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
     var body: some View {
@@ -1078,7 +1182,7 @@ struct CalendarMonthView: View {
                         week: week,
                         selectedDate: selectedDate,
                         eventsForDay: dayEvents,
-                        onSelect: { selectedDate = $0 }
+                        onSelect: onSelect
                     )
                 }
             }
@@ -1091,13 +1195,13 @@ struct CalendarMonthView: View {
     private var monthName: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM"
-        return formatter.string(from: selectedDate)
+        return formatter.string(from: month)
     }
 
     private var yearString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy"
-        return formatter.string(from: selectedDate)
+        return formatter.string(from: month)
     }
 
     private var calendarWeeks: [[CalendarDay]] {
@@ -1106,17 +1210,17 @@ struct CalendarMonthView: View {
 
     private var calendarDays: [CalendarDay] {
         let calendar = Calendar.current
-        let monthRange = calendar.range(of: .day, in: .month, for: selectedDate)!
+        let monthRange = calendar.range(of: .day, in: .month, for: month)!
         let numDays = monthRange.count
 
-        let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: selectedDate))!
+        let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!
         let firstWeekday = calendar.component(.weekday, from: firstDay)
         let adjustedFirstWeekday = (firstWeekday - 2 + 7) % 7
 
         var days: [CalendarDay] = []
 
         if adjustedFirstWeekday > 0 {
-            let previousMonth = calendar.date(byAdding: .month, value: -1, to: selectedDate)!
+            let previousMonth = calendar.date(byAdding: .month, value: -1, to: month)!
             let prevMonthDays = calendar.range(of: .day, in: .month, for: previousMonth)!.count
             let startDay = prevMonthDays - adjustedFirstWeekday + 1
 
@@ -1133,8 +1237,8 @@ struct CalendarMonthView: View {
         }
 
         let remainingDays = 42 - days.count
-        let nextMonth = calendar.date(byAdding: .month, value: 1, to: selectedDate)!
-        let nextMonthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonth))!
+        let nextMonthDate = calendar.date(byAdding: .month, value: 1, to: month)!
+        let nextMonthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonthDate))!
 
         for i in 1...remainingDays {
             let day = calendar.date(byAdding: .day, value: i - 1, to: nextMonthStart)!
