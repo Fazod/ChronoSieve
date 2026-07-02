@@ -25,6 +25,7 @@ targets:
         UILaunchScreen: {}
         NSCalendarsUsageDescription: "ChronoSieve needs access to your calendars to filter and display events."
         NSCalendarsFullAccessUsageDescription: "ChronoSieve needs full access to your calendars to read and filter your events."
+        NSContactsUsageDescription: "ChronoSieve uses your contacts to show photos of event attendees."
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
     settings:
