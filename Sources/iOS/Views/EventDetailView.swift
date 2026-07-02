@@ -17,7 +17,6 @@ struct EventDetailView: View {
     @State private var showingRSVPEditor = false
     @State private var showingRSVPPicker = false
     @State private var rsvpStatusOverride: RSVPStatus? = nil
-    @State private var rsvpEditStore: EKEventStore?
     @State private var rsvpEditEvent: EKEvent?
 
     // Optimistic local state — updates immediately when user picks a new calendar
@@ -79,12 +78,12 @@ struct EventDetailView: View {
                     onSelect: { rsvpStatusOverride = $0 }
                 )
             }
-            .sheet(isPresented: $showingRSVPEditor) {
-                if let store = rsvpEditStore, let ekEvent = rsvpEditEvent {
-                    EKEventEditRepresentable(eventStore: store, event: ekEvent) {
-                        showingRSVPEditor = false
-                    }
-                    .ignoresSafeArea()
+            .navigationDestination(isPresented: $showingRSVPEditor) {
+                if let ekEvent = rsvpEditEvent {
+                    EKEventViewRepresentable(event: ekEvent)
+                        .navigationTitle(event.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .ignoresSafeArea()
                 }
             }
             .toolbar {
@@ -310,13 +309,12 @@ struct EventDetailView: View {
     }
 
     private func openRSVPEditor() {
-        if let (store, ekEvent) = viewModel.rsvpEdit(for: event) {
-            // Real EventKit event — open system edit view (sends response to server)
-            rsvpEditStore = store
+        if let (_, ekEvent) = viewModel.rsvpEdit(for: event) {
+            // Real EventKit event — push EKEventViewController (shows native RSVP buttons)
             rsvpEditEvent = ekEvent
             showingRSVPEditor = true
         } else {
-            // Mock / unsupported calendar — fall back to local picker
+            // Mock / unsupported calendar — push custom SwiftUI picker
             showingRSVPPicker = true
         }
     }
