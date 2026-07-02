@@ -60,7 +60,7 @@
 
 /* Begin PBXFileReference section */
 		06643D45E899BB335D56D0D9 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
-		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaSnapshot.swift; sourceTree = "<group>"; };
 		48BD99690E8710D99FBFF96D /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
 		4DF3798727C1DA99D985DDD3 /* FilterRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRule.swift; sourceTree = "<group>"; };
@@ -70,7 +70,7 @@
 		64383037FF88A167D41F4873 /* ChronoSieveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveUITests.swift; sourceTree = "<group>"; };
 		656DC1DE31C305005B7089C3 /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
 		6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityReceiver.swift; sourceTree = "<group>"; };
-		6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ChronoSieve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6EBEA22D1ED8FC7174114D0B /* ChronoSieve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoSieve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74321E5BC0986716ED5E1047 /* AgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaViewModel.swift; sourceTree = "<group>"; };
 		76119AA9E83004428270632C /* FilterRuleRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRuleRecord.swift; sourceTree = "<group>"; };
 		8003747F52A24B8A3043D9BD /* ChronoSieveWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoSieveWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,7 +81,7 @@
 		89CAF70713B2F04DA7AA7242 /* AgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaView.swift; sourceTree = "<group>"; };
 		8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexFilterEngineTests.swift; sourceTree = "<group>"; };
 		923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronoSieveWatchApp.swift; sourceTree = "<group>"; };
-		93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		93A8CBB25272CF6479E2BA95 /* ChronoSieveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChronoSieveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		93C62B892EE91733F1DEBF61 /* RegexFilterEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexFilterEngine.swift; sourceTree = "<group>"; };
 		A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAgendaViewModel.swift; sourceTree = "<group>"; };
 		A42B4D5D2DF128083900C6DA /* MockCalendarFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCalendarFixtures.swift; sourceTree = "<group>"; };
@@ -345,7 +345,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					4FD2619C27E97A9167E01FC8 = {
 						DevelopmentTeam = Y9ARKG2EC6;
@@ -357,7 +357,6 @@
 						ProvisioningStyle = Automatic;
 					};
 					B91AA1FD5C82381A29345420 = {
-						DevelopmentTeam = Y9ARKG2EC6;
 						ProvisioningStyle = Automatic;
 					};
 					D679A99A6723E0F057618E0C = {
@@ -570,10 +569,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -593,6 +594,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.1;
@@ -622,6 +624,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				INFOPLIST_FILE = Resources/watchOS/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.watch;
 				SDKROOT = watchos;
@@ -635,6 +638,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				INFOPLIST_FILE = Resources/watchOS/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fdenk.chronosieve.watch;
 				SDKROOT = watchos;
@@ -697,10 +701,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y9ARKG2EC6;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -713,6 +719,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.1;
