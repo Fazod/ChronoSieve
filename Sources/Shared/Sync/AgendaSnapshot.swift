@@ -12,6 +12,8 @@ struct AgendaSnapshotEvent: Codable, Identifiable {
     var endDate: Date
     var isAllDay: Bool
     var calendarTitle: String
+    var location: String?
+    var calendarColorHex: String?
 }
 
 extension AgendaSnapshotEvent {
@@ -22,5 +24,7 @@ extension AgendaSnapshotEvent {
         self.endDate = event.endDate
         self.isAllDay = event.isAllDay
         self.calendarTitle = event.calendarTitle
+        self.location = event.location
+        self.calendarColorHex = event.calendarColorHex
     }
 }
