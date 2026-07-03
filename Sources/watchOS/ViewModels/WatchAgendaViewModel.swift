@@ -103,13 +103,49 @@ final class WatchAgendaViewModel: ObservableObject {
             .keys
             .sorted()
             .map { day in
-                let events = grouped[day, default: []].sorted(by: { $0.startDate < $1.startDate })
+                let events = grouped[day, default: []].sorted(by: sortEvents)
                 return WatchDayGroup(day: day, events: events)
             }
     }
 
+    func agendaSections(referenceDate: Date = Date()) -> [WatchDayGroup] {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: referenceDate)
+
+        return (0..<8).compactMap { dayOffset in
+            guard
+                let day = calendar.date(byAdding: .day, value: dayOffset, to: startOfToday),
+                let nextDay = calendar.date(byAdding: .day, value: 1, to: day)
+            else {
+                return nil
+            }
+
+            let dayEvents = events
+                .filter { overlaps(event: $0, start: day, end: nextDay) }
+                .sorted(by: sortEvents)
+
+            guard dayOffset == 0 || !dayEvents.isEmpty else {
+                return nil
+            }
+
+            return WatchDayGroup(day: day, events: dayEvents)
+        }
+    }
+
     private func overlaps(event: AgendaSnapshotEvent, start: Date, end: Date) -> Bool {
         event.startDate < end && event.endDate > start
+    }
+
+    private func sortEvents(_ lhs: AgendaSnapshotEvent, _ rhs: AgendaSnapshotEvent) -> Bool {
+        if lhs.isAllDay != rhs.isAllDay {
+            return lhs.isAllDay && !rhs.isAllDay
+        }
+
+        if lhs.startDate != rhs.startDate {
+            return lhs.startDate < rhs.startDate
+        }
+
+        return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
     }
 
     private func makePlaceholderEvents() -> [AgendaSnapshotEvent] {
@@ -121,7 +157,8 @@ final class WatchAgendaViewModel: ObservableObject {
                 startDate: now,
                 endDate: now.addingTimeInterval(1800),
                 isAllDay: false,
-                calendarTitle: "ChronoSieve"
+                calendarTitle: "ChronoSieve",
+                isCancelled: false
             )
         ]
     }

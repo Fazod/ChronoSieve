@@ -11,7 +11,7 @@ struct WatchAgendaView: View {
                 Color.black.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         ForEach(agendaSections) { section in
                             VStack(alignment: .leading, spacing: 8) {
                                 dayHeader(section.day)
@@ -21,9 +21,7 @@ struct WatchAgendaView: View {
                                 if section.events.isEmpty {
                                     emptyState(section.isToday ? "No events today" : "No events")
                                 } else {
-                                    ForEach(section.events) { event in
-                                        WatchEventCard(event: event)
-                                    }
+                                    WatchDaySectionContent(events: section.events)
                                 }
                             }
                         }
@@ -80,21 +78,9 @@ struct WatchAgendaView: View {
     }
 
     private var agendaSections: [AgendaSection] {
-        let todayStart = Calendar.current.startOfDay(for: Date())
-
-        let today = AgendaSection(
-            day: todayStart,
-            events: viewModel.events(for: .today),
-            isToday: true
-        )
-
-        let upcoming = viewModel.groupedEvents(for: .next7Days)
-            .filter { Calendar.current.startOfDay(for: $0.day) != todayStart }
-            .map {
-                AgendaSection(day: $0.day, events: $0.events, isToday: false)
-            }
-
-        return [today] + upcoming
+        viewModel.agendaSections().map { group in
+            AgendaSection(day: group.day, events: group.events)
+        }
     }
 
     private func headerTracker(for section: AgendaSection) -> some View {
@@ -220,9 +206,9 @@ struct WatchAgendaView: View {
 private struct AgendaSection: Identifiable {
     let day: Date
     let events: [AgendaSnapshotEvent]
-    let isToday: Bool
 
     var id: Date { day }
+    var isToday: Bool { Calendar.current.isDateInToday(day) }
 }
 
 private struct DayHeaderPosition: Equatable {
@@ -239,32 +225,141 @@ private struct DayHeaderPreferenceKey: PreferenceKey {
     }
 }
 
+private struct WatchDaySectionContent: View {
+    let events: [AgendaSnapshotEvent]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if !allDayEvents.isEmpty {
+                WatchAllDayEventSection(events: allDayEvents)
+            }
+
+            ForEach(timedEvents) { event in
+                WatchEventCard(event: event)
+            }
+        }
+    }
+
+    private var allDayEvents: [AgendaSnapshotEvent] {
+        events
+            .filter(\.isAllDay)
+            .sorted(by: sortEvents)
+    }
+
+    private var timedEvents: [AgendaSnapshotEvent] {
+        events
+            .filter { !$0.isAllDay }
+            .sorted(by: sortEvents)
+    }
+
+    private func sortEvents(_ lhs: AgendaSnapshotEvent, _ rhs: AgendaSnapshotEvent) -> Bool {
+        if lhs.startDate != rhs.startDate {
+            return lhs.startDate < rhs.startDate
+        }
+
+        return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+    }
+}
+
+private struct WatchAllDayEventSection: View {
+    let events: [AgendaSnapshotEvent]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("All-day", systemImage: "sun.max.fill")
+                .font(.system(size: 10.5, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.56))
+                .padding(.leading, 6)
+
+            VStack(spacing: 0) {
+                ForEach(Array(events.enumerated()), id: \.element.id) { index, event in
+                    WatchAllDayEventRow(event: event)
+
+                    if index < events.count - 1 {
+                        Rectangle()
+                            .fill(.white.opacity(0.08))
+                            .frame(height: 0.5)
+                            .padding(.leading, 18)
+                    }
+                }
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
+            }
+        }
+    }
+}
+
+private struct WatchAllDayEventRow: View {
+    let event: AgendaSnapshotEvent
+
+    private var accentColor: Color { Color(hex: event.calendarColorHex) }
+    private var isPast: Bool { event.endDate < Date() }
+    private var titleColor: Color { .white.opacity(isPast ? 0.48 : 0.82) }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(accentColor)
+                .frame(width: 6, height: 6)
+
+            Text(event.title)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(titleColor)
+                .strikethrough(event.isCancelled, color: titleColor)
+                .lineLimit(1)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .opacity(isPast ? 0.72 : 1.0)
+    }
+}
+
 private struct WatchEventCard: View {
     let event: AgendaSnapshotEvent
 
+    private var accentColor: Color { Color(hex: event.calendarColorHex) }
+    private var isPast: Bool { event.endDate < Date() }
+    private var titleColor: Color { .white.opacity(isPast ? 0.54 : 0.86) }
+    private var subtitleColor: Color { .white.opacity(isPast ? 0.34 : 0.58) }
+    private var timeColor: Color { .white.opacity(isPast ? 0.42 : 0.64) }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(accentColor)
+                    .frame(width: 6, height: 6)
+
                 Text(timeText)
                     .font(.system(size: 10.5, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(timeColor)
                     .monospacedDigit()
 
                 if isRemoteMeeting {
                     Image(systemName: "video.fill")
                         .font(.system(size: 9, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.white.opacity(isPast ? 0.28 : 0.5))
                 }
             }
 
             Text(event.title)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.white.opacity(0.84))
+                .foregroundStyle(titleColor)
+                .strikethrough(event.isCancelled, color: titleColor)
                 .lineLimit(2)
 
             Text(subtitle)
                 .font(.system(size: 10.5, weight: .regular))
-                .foregroundStyle(.white.opacity(0.58))
+                .foregroundStyle(subtitleColor)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -276,19 +371,25 @@ private struct WatchEventCard: View {
         )
         .overlay {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.white.opacity(0.05), lineWidth: 1)
+                .stroke(borderColor, lineWidth: 1)
         }
+        .opacity(isPast ? 0.76 : 1.0)
     }
 
-    private var cardBackground: some ShapeStyle {
+    private var cardBackground: LinearGradient {
         LinearGradient(
             colors: [
-                Color(red: 0.03, green: 0.24, blue: 0.45),
-                Color(red: 0.04, green: 0.20, blue: 0.38)
+                Color.white.opacity(0.035),
+                accentColor.opacity(isPast ? 0.08 : 0.18),
+                Color.black.opacity(isPast ? 0.44 : 0.26)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    private var borderColor: Color {
+        accentColor.opacity(isPast ? 0.16 : 0.34)
     }
 
     private var subtitle: String {
@@ -306,10 +407,6 @@ private struct WatchEventCard: View {
     private var timeText: String {
         let now = Date()
 
-        if event.isAllDay {
-            return "All-day"
-        }
-
         if event.startDate <= now && now < event.endDate {
             return "ends at " + event.endDate.formatted(date: .omitted, time: .shortened)
         }
@@ -317,5 +414,29 @@ private struct WatchEventCard: View {
         let start = event.startDate.formatted(date: .omitted, time: .shortened)
         let end = event.endDate.formatted(date: .omitted, time: .shortened)
         return "\(start) – \(end)"
+    }
+}
+
+private extension Color {
+    init(hex: String?) {
+        guard
+            let hex,
+            !hex.isEmpty
+        else {
+            self = .gray
+            return
+        }
+
+        let sanitized = hex.replacingOccurrences(of: "#", with: "")
+        guard sanitized.count == 6, let value = Int(sanitized, radix: 16) else {
+            self = .gray
+            return
+        }
+
+        self = Color(
+            red: Double((value >> 16) & 0xFF) / 255,
+            green: Double((value >> 8) & 0xFF) / 255,
+            blue: Double(value & 0xFF) / 255
+        )
     }
 }
