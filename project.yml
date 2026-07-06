@@ -18,6 +18,8 @@ targets:
     sources:
       - path: Sources/iOS
       - path: Sources/Shared
+    dependencies:
+      - target: ChronoSieveWatch
     info:
       path: Resources/iOS/Info.plist
       properties:
@@ -34,19 +36,39 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
 
   ChronoSieveWatch:
-    type: application
+    type: application.watchapp2
+    platform: watchOS
+    deploymentTarget: "10.0"
+    dependencies:
+      - target: ChronoSieveWatchExtension
+    info:
+      path: Resources/watchOS/Info.plist
+      properties:
+        CFBundleDisplayName: ChronoSieve Watch
+        WKCompanionAppBundleIdentifier: com.fdenk.chronosieve
+        WKWatchKitApp: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fdenk.chronosieve.watch
+
+  ChronoSieveWatchExtension:
+    type: watchkit2-extension
     platform: watchOS
     deploymentTarget: "10.0"
     sources:
       - path: Sources/watchOS
       - path: Sources/Shared
     info:
-      path: Resources/watchOS/Info.plist
+      path: Resources/watchOS/ExtensionInfo.plist
       properties:
-        CFBundleDisplayName: ChronoSieve Watch
+        CFBundleDisplayName: ChronoSieve Watch Extension
+        NSExtension:
+          NSExtensionAttributes:
+            WKAppBundleIdentifier: com.fdenk.chronosieve.watch
+          NSExtensionPointIdentifier: com.apple.watchkit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.fdenk.chronosieve.watch
+        PRODUCT_BUNDLE_IDENTIFIER: com.fdenk.chronosieve.watch.extension
 
   ChronoSieveTests:
     type: bundle.unit-test

@@ -45,6 +45,29 @@ open ChronoSieve.xcodeproj
 - You can run on your personal iPhone/Apple Watch.
 - Distribution (App Store/TestFlight) requires paid Apple Developer Program.
 
+## Build an AltStore IPA
+
+To build an unsigned `.ipa` for AltStore Classic:
+
+```bash
+./scripts/make-altstore-ipa.sh
+```
+
+If AltStore has trouble installing the full app bundle, build a phone-only IPA without the embedded watch companion:
+
+```bash
+./scripts/make-altstore-ipa-phone-only.sh
+```
+
+Output:
+
+```text
+build/AltStore/ChronoSieve-<version>-<build>.ipa
+build/AltStore/ChronoSieve-<version>-<build>-phone-only.ipa
+```
+
+See `Docs/ALTSTORE_IPA.md` for details.
+
 ## Next implementation steps
 1. Expand UI tests from rudimentary to full CRUD edge cases
 2. Run and verify on personal iPhone + Apple Watch (`Docs/ON_DEVICE_RUN.md`)
