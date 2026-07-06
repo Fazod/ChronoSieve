@@ -45,6 +45,7 @@ struct AgendaView: View {
             .toolbar(.hidden, for: .navigationBar)
             .overlay(alignment: .bottom) {
                 bottomControlBar
+                    .ignoresSafeArea(edges: .bottom)
             }
             .sheet(isPresented: $showingRuleManager) {
                 FilterRulesView()
@@ -171,7 +172,7 @@ struct AgendaView: View {
             }
         )
         .padding(.top, -10)
-        .padding(.bottom, 8)
+        .padding(.bottom, 4)
         .background(Color(.systemBackground))
         .overlay(alignment: .bottom) {
             Rectangle()
@@ -286,11 +287,11 @@ struct AgendaView: View {
             .tint(.primary)
             .accessibilityLabel("Controls")
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 25)
         .padding(.top, 8)
-        .padding(.bottom, 12)
+        .padding(.bottom, 0)
         .background(.clear)
-        .safeAreaPadding(.bottom)
+        .offset(y: 3)
     }
 
     private func goToToday() {
@@ -1274,8 +1275,8 @@ private struct MonthPageContent: View {
     }()
 
     var body: some View {
-        VStack(spacing: 8) {
-            VStack(alignment: .leading, spacing: 6) {
+        VStack(spacing: 5) {
+            VStack(alignment: .leading, spacing: 4) {
                 Button(action: onMonthYearTap) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(monthName)
@@ -1289,7 +1290,7 @@ private struct MonthPageContent: View {
                         Image(systemName: "chevron.down")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.secondary)
-                            .padding(.leading, 2)
+                            .padding(.leading, 1)
                     }
                     .minimumScaleFactor(0.8)
                     .contentShape(Rectangle())
@@ -1302,14 +1303,14 @@ private struct MonthPageContent: View {
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 15)
+                            .frame(height: 13)
                     }
                 }
             }
-            .padding(.horizontal, 18)
-            .padding(.top, 2)
+            .padding(.horizontal, 14)
+            .padding(.top, 1)
 
-            VStack(spacing: 2) {
+            VStack(spacing: 0) {
                 ForEach(Array(calendarWeeks.enumerated()), id: \.offset) { _, week in
                     CalendarWeekRow(
                         week: week,
@@ -1319,8 +1320,8 @@ private struct MonthPageContent: View {
                     )
                 }
             }
-            .padding(.horizontal, 18)
-            .padding(.bottom, 2)
+            .padding(.horizontal, 14)
+            .padding(.bottom, 1)
         }
         .frame(maxWidth: .infinity, alignment: .top)
     }
@@ -1392,7 +1393,7 @@ private struct CalendarWeekRow: View {
     let markersForDay: (Date) -> [CalendarDayMarker]
     let onSelect: (Date) -> Void
 
-    @ScaledMetric(relativeTo: .footnote) private var rowHighlightHeight = 41
+    @ScaledMetric(relativeTo: .footnote) private var rowHighlightHeight = 37
 
     var body: some View {
         HStack(spacing: 0) {
@@ -1407,7 +1408,7 @@ private struct CalendarWeekRow: View {
                 )
             }
         }
-        .frame(minHeight: 48)
+        .frame(minHeight: 44)
         .background(alignment: .center) {
             if containsSelectedDate {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -1431,8 +1432,8 @@ struct CalendarDayCell: View, Equatable {
     let markers: [CalendarDayMarker]
     let onTap: () -> Void
 
-    @ScaledMetric(relativeTo: .footnote) private var numberDiameter = 31
-    @ScaledMetric(relativeTo: .footnote) private var selectedBubbleSize = 46
+    @ScaledMetric(relativeTo: .footnote) private var numberDiameter = 28
+    @ScaledMetric(relativeTo: .footnote) private var selectedBubbleSize = 40
     @ScaledMetric(relativeTo: .caption2) private var dotSize = 4
 
     static func == (lhs: CalendarDayCell, rhs: CalendarDayCell) -> Bool {
@@ -1446,7 +1447,7 @@ struct CalendarDayCell: View, Equatable {
     var body: some View {
         Group {
             if isSelected {
-                VStack(spacing: 2) {
+                VStack(spacing: 1) {
                     Text("\(Calendar.current.component(.day, from: day.date))")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Color(.systemBackground))
@@ -1458,7 +1459,7 @@ struct CalendarDayCell: View, Equatable {
                     }
                     .frame(height: dotSize)
                     .opacity(markers.isEmpty ? 0 : 1)
-                    .offset(y: 2)
+                    .offset(y: 1)
                 }
                 .frame(width: selectedBubbleSize, height: selectedBubbleSize)
                 .background {
@@ -1466,7 +1467,7 @@ struct CalendarDayCell: View, Equatable {
                         .fill(.primary)
                 }
             } else if isToday {
-                VStack(spacing: 2) {
+                VStack(spacing: 1) {
                     Text("\(Calendar.current.component(.day, from: day.date))")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.primary)
@@ -1478,7 +1479,7 @@ struct CalendarDayCell: View, Equatable {
                     }
                     .frame(height: dotSize)
                     .opacity(markers.isEmpty ? 0 : 1)
-                    .offset(y: 2)
+                    .offset(y: 1)
                 }
                 .frame(width: selectedBubbleSize, height: selectedBubbleSize)
                 .background {
@@ -1503,7 +1504,7 @@ struct CalendarDayCell: View, Equatable {
                 }
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 48)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)
     }
