@@ -70,10 +70,7 @@ struct DayView: View {
     }
 
     private func eventsFor(date: Date) -> [CalendarEvent] {
-        let cal   = Calendar.current
-        let start = cal.startOfDay(for: date)
-        guard let end = cal.date(byAdding: .day, value: 1, to: start) else { return [] }
-        return viewModel.filteredEvents.filter { $0.startDate < end && $0.endDate > start }
+        viewModel.events(on: date)
     }
 }
 

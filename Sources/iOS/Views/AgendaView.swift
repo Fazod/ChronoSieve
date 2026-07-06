@@ -17,7 +17,8 @@ struct AgendaView: View {
     @State private var selectedDate = Calendar.current.startOfDay(for: Date())
     @State private var stickyCalendarHeight: CGFloat = 0
     @State private var stickyDayHeaderHeight: CGFloat = 0
-    @State private var pendingScrollDate: Date?
+    @State private var pendingScrollDate: Date? = Calendar.current.startOfDay(for: Date())
+    @State private var pendingPrependRestoreDate: Date?
     @State private var isProgrammaticScroll = false
 
     private var viewMode: AppViewMode {
@@ -82,15 +83,30 @@ struct AgendaView: View {
         ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    Color.clear
+                        .frame(height: 1)
+                        .onAppear {
+                            guard pendingScrollDate == nil,
+                                  let firstDay = agendaDayGroups.first?.day else { return }
+                            Task {
+                                await loadPreviousIfNeededPreservingPosition(currentDay: firstDay)
+                            }
+                        }
+
                     ForEach(agendaDayGroups) { group in
                         Section {
                             AgendaDaySectionContent(events: group.events)
                                 .padding(.horizontal, 16)
                                 .background(sectionOffsetReader(for: group))
                                 .onAppear {
-                                    guard shouldPrefetchMore(for: group) else { return }
                                     Task {
-                                        await viewModel.loadMoreIfNeeded(currentDay: group.day)
+                                        if pendingScrollDate == nil, shouldPrefetchPrevious(for: group) {
+                                            await loadPreviousIfNeededPreservingPosition(currentDay: group.day)
+                                        }
+
+                                        if shouldPrefetchMore(for: group) {
+                                            await viewModel.loadMoreIfNeeded(currentDay: group.day)
+                                        }
                                     }
                                 }
                         } header: {
@@ -138,15 +154,21 @@ struct AgendaView: View {
                 scrollToPendingDate(with: proxy)
             }
             .onChange(of: agendaDayGroupIDs) { _, _ in
-                scrollToPendingDate(with: proxy)
+                if pendingPrependRestoreDate != nil {
+                    restorePrependAnchor(with: proxy)
+                } else {
+                    scrollToPendingDate(with: proxy)
+                }
             }
         }
     }
 
     private var stickyCalendarOverlay: some View {
         CalendarMonthView(
-            events: viewModel.filteredEvents,
-            selectedDate: calendarSelectionBinding
+            selectedDate: calendarSelectionBinding,
+            markersForDay: { day in
+                viewModel.dayMarkers(on: day)
+            }
         )
         .padding(.top, -10)
         .padding(.bottom, 8)
@@ -338,7 +360,7 @@ struct AgendaView: View {
 
         guard let loadedInterval = viewModel.loadedInterval else {
             return [
-                AgendaDayGroup(day: selectedDay, events: events(for: selectedDay))
+                AgendaDayGroup(day: selectedDay, events: viewModel.events(on: selectedDay))
             ]
         }
 
@@ -349,7 +371,7 @@ struct AgendaView: View {
         var cursor = startDay
 
         while cursor < endDay {
-            let dayEvents = events(for: cursor)
+            let dayEvents = viewModel.events(on: cursor)
             if !dayEvents.isEmpty || calendar.isDate(cursor, inSameDayAs: selectedDay) {
                 groups.append(AgendaDayGroup(day: cursor, events: dayEvents))
             }
@@ -408,16 +430,12 @@ struct AgendaView: View {
         }
     }
 
-    private func events(for day: Date) -> [CalendarEvent] {
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: day)
-        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else {
-            return []
+    private func shouldPrefetchPrevious(for group: AgendaDayGroup) -> Bool {
+        guard let index = agendaDayGroups.firstIndex(where: { $0.id == group.id }) else {
+            return false
         }
 
-        return viewModel.filteredEvents
-            .filter { $0.startDate < endOfDay && $0.endDate > startOfDay }
-            .sorted(by: { $0.startDate < $1.startDate })
+        return index <= 2
     }
 
     private func shouldPrefetchMore(for group: AgendaDayGroup) -> Bool {
@@ -494,6 +512,43 @@ struct AgendaView: View {
             self.pendingScrollDate = nil
             self.isProgrammaticScroll = false
         }
+    }
+
+    private func restorePrependAnchor(with proxy: ScrollViewProxy) {
+        guard let pendingPrependRestoreDate else {
+            return
+        }
+
+        guard let targetGroup = targetAgendaGroup(for: pendingPrependRestoreDate) else {
+            return
+        }
+
+        isProgrammaticScroll = true
+        var transaction = Transaction()
+        transaction.animation = nil
+        withTransaction(transaction) {
+            proxy.scrollTo(targetGroup.id, anchor: .top)
+        }
+
+        DispatchQueue.main.async {
+            self.pendingPrependRestoreDate = nil
+            self.isProgrammaticScroll = false
+        }
+    }
+
+    private func loadPreviousIfNeededPreservingPosition(currentDay: Date) async {
+        let anchorDate = Calendar.current.startOfDay(for: selectedDate)
+        let previousStart = viewModel.loadedInterval?.start
+        await viewModel.loadPreviousIfNeeded(currentDay: currentDay)
+
+        guard let previousStart,
+              let newStart = viewModel.loadedInterval?.start,
+              newStart < previousStart
+        else {
+            return
+        }
+
+        pendingPrependRestoreDate = anchorDate
     }
 
     private func targetAgendaGroup(for date: Date) -> AgendaDayGroup? {
@@ -870,15 +925,35 @@ private struct MiniAttendeeAvatar: View {
 }
 
 private struct EventStatusDot: View {
-    let event: CalendarEvent
+    let colorHex: String
+    let style: CalendarDayMarker.Style
     let size: CGFloat
     var onDarkBackground = false
 
+    init(event: CalendarEvent, size: CGFloat, onDarkBackground: Bool = false) {
+        self.colorHex = event.calendarColorHex
+        switch event.rsvpStatus {
+        case .tentative, .notResponded:
+            self.style = .outlined
+        case .unknown, .accepted, .declined:
+            self.style = .filled
+        }
+        self.size = size
+        self.onDarkBackground = onDarkBackground
+    }
+
+    init(marker: CalendarDayMarker, size: CGFloat, onDarkBackground: Bool = false) {
+        self.colorHex = marker.colorHex
+        self.style = marker.style
+        self.size = size
+        self.onDarkBackground = onDarkBackground
+    }
+
     var body: some View {
-        let color = Color(hex: event.calendarColorHex)
+        let color = Color(hex: colorHex)
 
         Group {
-            if event.rsvpStatus == .tentative || event.rsvpStatus == .notResponded {
+            if style == .outlined {
                 ZStack {
                     if onDarkBackground {
                         Circle()
@@ -1064,32 +1139,28 @@ private extension Color {
 // MARK: - Calendar Month View
 
 struct CalendarMonthView: View {
-    let events: [CalendarEvent]
     @Binding var selectedDate: Date
+    let markersForDay: (Date) -> [CalendarDayMarker]
 
-    /// Total number of paged months available for swiping (±120 months / ±10 years around today).
-    private static let totalPages = 241
-    /// Index of the page that corresponds to today's month.
-    private static let centerPage = 120
+    /// Small virtualized window of pages around the current month.
+    private static let pageWindowSize = 5
+    private static let centerPage = pageWindowSize / 2
+    private static let dotRenderDistance = 1
 
     @State private var pageIndex: Int
-    /// First day of the month that was current when this view was initialised
-    /// (i.e. today's month). Used as the fixed reference for page offsets.
+    /// First day of the month currently shown in the center page.
     @State private var anchorMonth: Date
     @State private var showingMonthYearPicker = false
 
-    init(events: [CalendarEvent], selectedDate: Binding<Date>) {
-        self.events = events
+    init(selectedDate: Binding<Date>, markersForDay: @escaping (Date) -> [CalendarDayMarker]) {
         self._selectedDate = selectedDate
+        self.markersForDay = markersForDay
 
-        let cal        = Calendar.current
-        let todayMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date()))!
-        let selMonth   = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate.wrappedValue))!
-        let diff       = cal.dateComponents([.month], from: todayMonth, to: selMonth).month ?? 0
-        let page       = max(0, min(Self.totalPages - 1, Self.centerPage + diff))
+        let cal = Calendar.current
+        let selectedMonth = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate.wrappedValue))!
 
-        self._pageIndex   = State(initialValue: page)
-        self._anchorMonth = State(initialValue: todayMonth)
+        self._pageIndex = State(initialValue: Self.centerPage)
+        self._anchorMonth = State(initialValue: selectedMonth)
     }
 
     var body: some View {
@@ -1098,8 +1169,9 @@ struct CalendarMonthView: View {
         // correct space without an explicit frame.
         MonthPageContent(
             month: anchorMonth,
-            events: [],
             selectedDate: anchorMonth,
+            markersForDay: { _ in [] },
+            showsEventDots: false,
             onSelect: { _ in },
             onMonthYearTap: {}
         )
@@ -1107,11 +1179,12 @@ struct CalendarMonthView: View {
         .allowsHitTesting(false)
         .overlay {
             TabView(selection: $pageIndex) {
-                ForEach(0..<Self.totalPages, id: \.self) { idx in
+                ForEach(0..<Self.pageWindowSize, id: \.self) { idx in
                     MonthPageContent(
                         month: monthDate(for: idx),
-                        events: events,
                         selectedDate: selectedDate,
+                        markersForDay: markersForDay,
+                        showsEventDots: abs(idx - pageIndex) <= Self.dotRenderDistance,
                         onSelect: { selectedDate = $0 },
                         onMonthYearTap: { showingMonthYearPicker = true }
                     )
@@ -1124,7 +1197,7 @@ struct CalendarMonthView: View {
             syncSelectedDate(for: newPage)
         }
         .onChange(of: selectedDate) { _, newDate in
-            syncPageIndex(for: newDate)
+            recenterPager(for: newDate)
         }
         .sheet(isPresented: $showingMonthYearPicker) {
             MonthYearPickerSheet(selectedDate: $selectedDate)
@@ -1141,30 +1214,39 @@ struct CalendarMonthView: View {
     /// User swiped to a new month page: move `selectedDate` to the same
     /// day-of-month in the new month (clamped) so the agenda follows.
     private func syncSelectedDate(for page: Int) {
-        let cal      = Calendar.current
-        let newMonth = monthDate(for: page)
-        let curMonth = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate))!
-        guard !cal.isDate(newMonth, equalTo: curMonth, toGranularity: .month) else { return }
+        guard page != Self.centerPage else { return }
 
-        let day         = cal.component(.day, from: selectedDate)
+        let cal = Calendar.current
+        let newMonth = monthDate(for: page)
+        let currentMonth = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate))!
+        guard !cal.isDate(newMonth, equalTo: currentMonth, toGranularity: .month) else { return }
+
+        let day = cal.component(.day, from: selectedDate)
         let daysInMonth = cal.range(of: .day, in: .month, for: newMonth)!.count
-        var comps       = cal.dateComponents([.year, .month], from: newMonth)
-        comps.day       = min(day, daysInMonth)
-        if let newDate  = cal.date(from: comps) {
+        var comps = cal.dateComponents([.year, .month], from: newMonth)
+        comps.day = min(day, daysInMonth)
+        if let newDate = cal.date(from: comps) {
             selectedDate = newDate
         }
     }
 
-    /// `selectedDate` changed externally (agenda scroll, "Today" tap, day tap):
-    /// snap the pager to the corresponding month.
-    private func syncPageIndex(for date: Date) {
-        let cal      = Calendar.current
+    /// Keep the pager centered around the selected month so only a tiny
+    /// window of pages exists at any time.
+    private func recenterPager(for date: Date) {
+        let cal = Calendar.current
         let newMonth = cal.date(from: cal.dateComponents([.year, .month], from: date))!
-        let diff     = cal.dateComponents([.month], from: anchorMonth, to: newMonth).month ?? 0
-        let page     = max(0, min(Self.totalPages - 1, Self.centerPage + diff))
-        guard page != pageIndex else { return }
-        withAnimation(.easeInOut(duration: 0.3)) {
-            pageIndex = page
+        let needsRecenter = !cal.isDate(newMonth, equalTo: anchorMonth, toGranularity: .month)
+            || pageIndex != Self.centerPage
+
+        guard needsRecenter else { return }
+
+        DispatchQueue.main.async {
+            var transaction = Transaction()
+            transaction.animation = nil
+            withTransaction(transaction) {
+                anchorMonth = newMonth
+                pageIndex = Self.centerPage
+            }
         }
     }
 }
@@ -1173,12 +1255,23 @@ struct CalendarMonthView: View {
 
 private struct MonthPageContent: View {
     let month: Date
-    let events: [CalendarEvent]
     let selectedDate: Date
+    let markersForDay: (Date) -> [CalendarDayMarker]
+    let showsEventDots: Bool
     let onSelect: (Date) -> Void
     var onMonthYearTap: () -> Void = {}
 
     private let weekdaySymbols = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+    private static let monthFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM"
+        return formatter
+    }()
+    private static let yearFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy"
+        return formatter
+    }()
 
     var body: some View {
         VStack(spacing: 8) {
@@ -1221,7 +1314,7 @@ private struct MonthPageContent: View {
                     CalendarWeekRow(
                         week: week,
                         selectedDate: selectedDate,
-                        eventsForDay: dayEvents,
+                        markersForDay: dayMarkers,
                         onSelect: onSelect
                     )
                 }
@@ -1233,15 +1326,11 @@ private struct MonthPageContent: View {
     }
 
     private var monthName: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM"
-        return formatter.string(from: month)
+        Self.monthFormatter.string(from: month)
     }
 
     private var yearString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy"
-        return formatter.string(from: month)
+        Self.yearFormatter.string(from: month)
     }
 
     private var calendarWeeks: [[CalendarDay]] {
@@ -1288,23 +1377,19 @@ private struct MonthPageContent: View {
         return days
     }
 
-    private func dayEvents(for date: Date) -> [CalendarEvent] {
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: date)
-        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else {
+    private func dayMarkers(for date: Date) -> [CalendarDayMarker] {
+        guard showsEventDots else {
             return []
         }
 
-        return events
-            .filter { $0.startDate < endOfDay && $0.endDate > startOfDay }
-            .sorted(by: { $0.startDate < $1.startDate })
+        return markersForDay(date)
     }
 }
 
 private struct CalendarWeekRow: View {
     let week: [CalendarDay]
     let selectedDate: Date
-    let eventsForDay: (Date) -> [CalendarEvent]
+    let markersForDay: (Date) -> [CalendarDayMarker]
     let onSelect: (Date) -> Void
 
     @ScaledMetric(relativeTo: .footnote) private var rowHighlightHeight = 41
@@ -1317,7 +1402,7 @@ private struct CalendarWeekRow: View {
                     isSelected: Calendar.current.isDate(day.date, inSameDayAs: selectedDate),
                     isCurrentMonth: day.isCurrentMonth,
                     isToday: Calendar.current.isDateInToday(day.date),
-                    events: eventsForDay(day.date),
+                    markers: markersForDay(day.date),
                     onTap: { onSelect(day.date) }
                 )
             }
@@ -1338,17 +1423,25 @@ private struct CalendarWeekRow: View {
     }
 }
 
-struct CalendarDayCell: View {
+struct CalendarDayCell: View, Equatable {
     let day: CalendarDay
     let isSelected: Bool
     let isCurrentMonth: Bool
     let isToday: Bool
-    let events: [CalendarEvent]
+    let markers: [CalendarDayMarker]
     let onTap: () -> Void
 
     @ScaledMetric(relativeTo: .footnote) private var numberDiameter = 31
     @ScaledMetric(relativeTo: .footnote) private var selectedBubbleSize = 46
     @ScaledMetric(relativeTo: .caption2) private var dotSize = 4
+
+    static func == (lhs: CalendarDayCell, rhs: CalendarDayCell) -> Bool {
+        lhs.day == rhs.day
+            && lhs.isSelected == rhs.isSelected
+            && lhs.isCurrentMonth == rhs.isCurrentMonth
+            && lhs.isToday == rhs.isToday
+            && lhs.markers == rhs.markers
+    }
 
     var body: some View {
         Group {
@@ -1359,12 +1452,12 @@ struct CalendarDayCell: View {
                         .foregroundStyle(Color(.systemBackground))
 
                     HStack(spacing: 3) {
-                        ForEach(Array(events.prefix(4)), id: \.id) { event in
-                            EventStatusDot(event: event, size: dotSize, onDarkBackground: true)
+                        ForEach(markers) { marker in
+                            EventStatusDot(marker: marker, size: dotSize, onDarkBackground: true)
                         }
                     }
                     .frame(height: dotSize)
-                    .opacity(events.isEmpty ? 0 : 1)
+                    .opacity(markers.isEmpty ? 0 : 1)
                     .offset(y: 2)
                 }
                 .frame(width: selectedBubbleSize, height: selectedBubbleSize)
@@ -1379,12 +1472,12 @@ struct CalendarDayCell: View {
                         .foregroundStyle(.primary)
 
                     HStack(spacing: 3) {
-                        ForEach(Array(events.prefix(4)), id: \.id) { event in
-                            EventStatusDot(event: event, size: dotSize)
+                        ForEach(markers) { marker in
+                            EventStatusDot(marker: marker, size: dotSize)
                         }
                     }
                     .frame(height: dotSize)
-                    .opacity(events.isEmpty ? 0 : 1)
+                    .opacity(markers.isEmpty ? 0 : 1)
                     .offset(y: 2)
                 }
                 .frame(width: selectedBubbleSize, height: selectedBubbleSize)
@@ -1400,12 +1493,12 @@ struct CalendarDayCell: View {
                         .frame(width: numberDiameter, height: numberDiameter)
 
                     HStack(spacing: 3) {
-                        ForEach(Array(events.prefix(4)), id: \.id) { event in
-                            EventStatusDot(event: event, size: dotSize)
+                        ForEach(markers) { marker in
+                            EventStatusDot(marker: marker, size: dotSize)
                         }
                     }
                     .frame(height: dotSize)
-                    .opacity(events.isEmpty ? 0 : 1)
+                    .opacity(markers.isEmpty ? 0 : 1)
                     .offset(y: -3)
                 }
             }
@@ -1505,15 +1598,11 @@ private struct MonthYearPickerSheet: View {
     }
 }
 
-struct CalendarDay: Identifiable {
+struct CalendarDay: Identifiable, Hashable {
     let date: Date
     let isCurrentMonth: Bool
 
-    var id: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: date)
-    }
+    var id: Date { date }
 }
 
 private extension Array {

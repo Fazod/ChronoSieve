@@ -1,6 +1,29 @@
 import EventKit
 import Foundation
 
+struct CalendarDayMarker: Identifiable, Hashable {
+    enum Style: Hashable {
+        case filled
+        case outlined
+    }
+
+    let id: String
+    let colorHex: String
+    let style: Style
+
+    init(event: CalendarEvent) {
+        id = event.id
+        colorHex = event.calendarColorHex
+
+        switch event.rsvpStatus {
+        case .tentative, .notResponded:
+            style = .outlined
+        case .unknown, .accepted, .declined:
+            style = .filled
+        }
+    }
+}
+
 @MainActor
 final class AgendaViewModel: ObservableObject {
     @Published private(set) var allEvents: [CalendarEvent] = []
@@ -11,22 +34,28 @@ final class AgendaViewModel: ObservableObject {
     @Published private(set) var loadedInterval: DateInterval?
     @Published var permissionDenied = false
 
+    private var filteredEventsByDay: [Date: [CalendarEvent]] = [:]
+    private var filteredMarkersByDay: [Date: [CalendarDayMarker]] = [:]
+
     private let calendarService: CalendarServiceProtocol
     private let watchSyncService: WatchSyncService
     private var filterEngine = RegexFilterEngine()
 
+    private let minimumInitialLookBehindDays = 7
     private let initialLookAheadDays = 45
+    private let incrementalLookBehindDays = 30
     private let incrementalLookAheadDays = 30
     private let prefetchThresholdDays = 7
     private let periodicRefreshInterval: TimeInterval = 15 * 60
     private let selectedCalendarIDsKey = "selectedCalendarIDs"
 
+    private var lookBehindDays = AgendaViewModel.defaultInitialLookBehindDays(referenceDate: Date())
     private var lookAheadDays = 45
     private var lastFetchedInterval: DateInterval?
     private var lastRefreshAt: Date?
     private var hasPendingStoreChange = false
     private var hasLoadedCalendarSelection = false
-    private var isExtendingLookAhead = false
+    private var isExtendingVisibleRange = false
     private var changeRefreshTask: Task<Void, Never>?
 
     init(
@@ -183,18 +212,35 @@ final class AgendaViewModel: ObservableObject {
             && abs(lhs.end.timeIntervalSince(rhs.end)) < 1
     }
 
+    func events(on day: Date) -> [CalendarEvent] {
+        let normalizedDay = Calendar.autoupdatingCurrent.startOfDay(for: day)
+        return filteredEventsByDay[normalizedDay] ?? []
+    }
+
+    func dayMarkers(on day: Date) -> [CalendarDayMarker] {
+        let normalizedDay = Calendar.autoupdatingCurrent.startOfDay(for: day)
+        return filteredMarkersByDay[normalizedDay] ?? []
+    }
+
     func ensureDateLoaded(_ date: Date) async {
         let calendar = Calendar.autoupdatingCurrent
         let today = calendar.startOfDay(for: Date())
         let targetDay = calendar.startOfDay(for: date)
         let dayDistance = calendar.dateComponents([.day], from: today, to: targetDay).day ?? 0
-        let requiredLookAheadDays = max(initialLookAheadDays, dayDistance + prefetchThresholdDays + 1)
 
-        guard requiredLookAheadDays > lookAheadDays else {
-            return
-        }
+        let requiredLookBehindDays = max(
+            minimumInitialLookBehindDays,
+            max(0, -dayDistance) + prefetchThresholdDays
+        )
+        let requiredLookAheadDays = max(
+            initialLookAheadDays,
+            max(0, dayDistance) + prefetchThresholdDays + 1
+        )
 
-        await extendLookAhead(toAtLeast: requiredLookAheadDays)
+        await extendVisibleRange(
+            toAtLeastLookBehind: requiredLookBehindDays,
+            lookAhead: requiredLookAheadDays
+        )
     }
 
     func loadMoreIfNeeded(currentDay: Date) async {
@@ -210,29 +256,57 @@ final class AgendaViewModel: ObservableObject {
             return
         }
 
-        await extendLookAhead(toAtLeast: lookAheadDays + incrementalLookAheadDays)
+        await extendVisibleRange(
+            toAtLeastLookBehind: lookBehindDays,
+            lookAhead: lookAheadDays + incrementalLookAheadDays
+        )
     }
 
-    private func extendLookAhead(toAtLeast minimumDays: Int) async {
-        guard !isExtendingLookAhead else {
+    func loadPreviousIfNeeded(currentDay: Date) async {
+        guard let loadedInterval else {
             return
         }
 
-        guard minimumDays > lookAheadDays else {
+        let calendar = Calendar.autoupdatingCurrent
+        let thresholdDate = calendar.date(byAdding: .day, value: prefetchThresholdDays, to: loadedInterval.start)
+            ?? loadedInterval.start
+
+        guard calendar.startOfDay(for: currentDay) <= calendar.startOfDay(for: thresholdDate) else {
             return
         }
 
-        isExtendingLookAhead = true
-        lookAheadDays = minimumDays
+        await extendVisibleRange(
+            toAtLeastLookBehind: lookBehindDays + incrementalLookBehindDays,
+            lookAhead: lookAheadDays
+        )
+    }
+
+    private func extendVisibleRange(toAtLeastLookBehind minimumLookBehindDays: Int, lookAhead minimumLookAheadDays: Int) async {
+        guard !isExtendingVisibleRange else {
+            return
+        }
+
+        let needsMoreHistory = minimumLookBehindDays > lookBehindDays
+        let needsMoreFuture = minimumLookAheadDays > lookAheadDays
+
+        guard needsMoreHistory || needsMoreFuture else {
+            return
+        }
+
+        isExtendingVisibleRange = true
+        lookBehindDays = max(lookBehindDays, minimumLookBehindDays)
+        lookAheadDays = max(lookAheadDays, minimumLookAheadDays)
         await refresh(force: true)
-        isExtendingLookAhead = false
+        isExtendingVisibleRange = false
     }
 
     private func makeFetchInterval(referenceDate: Date) -> DateInterval {
         let calendar = Calendar.autoupdatingCurrent
-        let start = calendar.startOfDay(for: referenceDate)
-        let end = calendar.date(byAdding: .day, value: lookAheadDays, to: start)
-            ?? start.addingTimeInterval(TimeInterval(lookAheadDays * 86_400))
+        let today = calendar.startOfDay(for: referenceDate)
+        let start = calendar.date(byAdding: .day, value: -lookBehindDays, to: today)
+            ?? today.addingTimeInterval(TimeInterval(-lookBehindDays * 86_400))
+        let end = calendar.date(byAdding: .day, value: lookAheadDays, to: today)
+            ?? today.addingTimeInterval(TimeInterval(lookAheadDays * 86_400))
         return DateInterval(start: start, end: end)
     }
 
@@ -248,7 +322,52 @@ final class AgendaViewModel: ObservableObject {
     }
 
     private func applyFilters() {
-        filteredEvents = filterEngine.apply(rules: activeRules, to: allEvents)
-        watchSyncService.push(events: filteredEvents)
+        let filtered = filterEngine.apply(rules: activeRules, to: allEvents)
+        let groupedEvents = buildDayIndex(for: filtered)
+
+        filteredEvents = filtered
+        filteredEventsByDay = groupedEvents
+        filteredMarkersByDay = buildDayMarkers(from: groupedEvents)
+        watchSyncService.push(events: filtered)
+    }
+
+    private func buildDayIndex(for events: [CalendarEvent]) -> [Date: [CalendarEvent]] {
+        let calendar = Calendar.autoupdatingCurrent
+        var grouped: [Date: [CalendarEvent]] = [:]
+
+        for event in events {
+            let startDay = calendar.startOfDay(for: event.startDate)
+            let inclusiveEndDate = max(event.startDate, event.endDate.addingTimeInterval(-1))
+            let endDay = calendar.startOfDay(for: inclusiveEndDate)
+
+            var cursor = startDay
+            while cursor <= endDay {
+                grouped[cursor, default: []].append(event)
+                guard let nextDay = calendar.date(byAdding: .day, value: 1, to: cursor) else {
+                    break
+                }
+                cursor = nextDay
+            }
+        }
+
+        for day in grouped.keys {
+            grouped[day]?.sort(by: { $0.startDate < $1.startDate })
+        }
+
+        return grouped
+    }
+
+    private func buildDayMarkers(from groupedEvents: [Date: [CalendarEvent]]) -> [Date: [CalendarDayMarker]] {
+        groupedEvents.mapValues { events in
+            Array(events.prefix(4)).map(CalendarDayMarker.init(event:))
+        }
+    }
+
+    private static func defaultInitialLookBehindDays(referenceDate: Date) -> Int {
+        let calendar = Calendar.autoupdatingCurrent
+        let today = calendar.startOfDay(for: referenceDate)
+        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: today)) ?? today
+        let daysSinceStartOfMonth = calendar.dateComponents([.day], from: startOfMonth, to: today).day ?? 0
+        return max(7, daysSinceStartOfMonth)
     }
 }

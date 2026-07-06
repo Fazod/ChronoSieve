@@ -11,6 +11,7 @@
 		0C5D070F93DF8B62B4DB5BFA /* FilterRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0A363700E7AD4CC0038A20 /* FilterRulesView.swift */; };
 		0F3A901B82CAA4250CE90194 /* AgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89CAF70713B2F04DA7AA7242 /* AgendaView.swift */; };
 		1C0AC699CFBA1DAA85DFB0B9 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BD99690E8710D99FBFF96D /* DayView.swift */; };
+		28E8733F42550C65EB6D3EE1 /* AgendaViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461102F1338A74BB942C8FE3 /* AgendaViewModelTests.swift */; };
 		2D0E85D9E0118998724ACD2F /* RuntimeEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821638FABA765E98C992F496 /* RuntimeEnvironment.swift */; };
 		323293386C88FF6DD1DBB9F8 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06643D45E899BB335D56D0D9 /* CalendarSource.swift */; };
 		36DC03D69059B2C21676C3DC /* MockCalendarFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42B4D5D2DF128083900C6DA /* MockCalendarFixtures.swift */; };
@@ -64,6 +65,7 @@
 		06643D45E899BB335D56D0D9 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
 		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaSnapshot.swift; sourceTree = "<group>"; };
+		461102F1338A74BB942C8FE3 /* AgendaViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaViewModelTests.swift; sourceTree = "<group>"; };
 		48BD99690E8710D99FBFF96D /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
 		4DF3798727C1DA99D985DDD3 /* FilterRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterRule.swift; sourceTree = "<group>"; };
 		4E1B62E00FBDF38347DC994D /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 		B9010102C44112C04142206F /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				461102F1338A74BB942C8FE3 /* AgendaViewModelTests.swift */,
 				8E91BF113974797625434A30 /* RegexFilterEngineTests.swift */,
 			);
 			name = iOS;
@@ -399,6 +402,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28E8733F42550C65EB6D3EE1 /* AgendaViewModelTests.swift in Sources */,
 				69E160C5DD744785561359C9 /* RegexFilterEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

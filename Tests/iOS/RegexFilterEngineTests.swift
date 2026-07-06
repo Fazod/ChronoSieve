@@ -140,7 +140,12 @@ final class RegexFilterEngineTests: XCTestCase {
             notes: notes,
             location: location,
             calendarTitle: calendarTitle,
-            calendarColorHex: "#3366FF"
+            calendarID: "calendar-1",
+            calendarColorHex: "#3366FF",
+            rsvpStatus: .accepted,
+            attendees: [],
+            recurrenceDescription: nil,
+            isCancelled: false
         )
     }
 }
