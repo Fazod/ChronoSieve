@@ -39,17 +39,26 @@ targets:
     type: application.watchapp2
     platform: watchOS
     deploymentTarget: "10.0"
+    sources:
+      - path: Resources/watchOS/Assets.xcassets
     dependencies:
       - target: ChronoSieveWatchExtension
+      - target: ChronoSieveWatchWidget
     info:
       path: Resources/watchOS/Info.plist
       properties:
         CFBundleDisplayName: ChronoSieve Watch
         WKCompanionAppBundleIdentifier: com.fdenk.chronosieve
         WKWatchKitApp: true
+    entitlements:
+      path: Resources/watchOS/ChronoSieveWatch.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.fdenk.chronosieve.watch
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fdenk.chronosieve.watch
+        ASSETCATALOG_COMPILER_APPICON_NAME: WatchAppIcon
 
   ChronoSieveWatchExtension:
     type: watchkit2-extension
@@ -66,9 +75,36 @@ targets:
           NSExtensionAttributes:
             WKAppBundleIdentifier: com.fdenk.chronosieve.watch
           NSExtensionPointIdentifier: com.apple.watchkit
+    entitlements:
+      path: Resources/watchOS/ChronoSieveWatchExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.fdenk.chronosieve.watch
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fdenk.chronosieve.watch.extension
+
+  ChronoSieveWatchWidget:
+    type: app-extension
+    platform: watchOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Sources/watchWidget
+      - path: Sources/Shared
+    info:
+      path: Resources/watchOS/WidgetInfo.plist
+      properties:
+        CFBundleDisplayName: ChronoSieve Widget
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Resources/watchOS/ChronoSieveWatchWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.fdenk.chronosieve.watch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fdenk.chronosieve.watch.widget
 
   ChronoSieveTests:
     type: bundle.unit-test

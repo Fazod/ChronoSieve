@@ -1,11 +1,11 @@
 import Foundation
 import WatchConnectivity
+import WidgetKit
 
 @MainActor
 final class WatchConnectivityReceiver: NSObject {
     static let shared = WatchConnectivityReceiver()
 
-    private let snapshotKey = "agendaSnapshot"
 
     private override init() {
         super.init()
@@ -31,8 +31,9 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
         _ session: WCSession,
         didReceiveApplicationContext applicationContext: [String: Any]
     ) {
-        guard let data = applicationContext["agendaSnapshot"] as? Data else { return }
-        UserDefaults.standard.set(data, forKey: "agendaSnapshot")
+        guard let data = applicationContext[AgendaSnapshotStore.snapshotKey] as? Data else { return }
+        AgendaSnapshotStore.storeShared(data)
+        WidgetCenter.shared.reloadTimelines(ofKind: ChronoSieveWidgetKind.dailyAgenda)
         NotificationCenter.default.post(name: .agendaSnapshotUpdated, object: nil)
     }
 }

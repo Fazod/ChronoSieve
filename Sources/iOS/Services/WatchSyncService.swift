@@ -5,7 +5,6 @@ import WatchConnectivity
 final class WatchSyncService: NSObject {
     static let shared = WatchSyncService()
 
-    private let snapshotKey = "agendaSnapshot"
     private let encoder = JSONEncoder()
 
     private override init() {
@@ -23,13 +22,13 @@ final class WatchSyncService: NSObject {
             return
         }
 
-        UserDefaults.standard.set(data, forKey: snapshotKey)
+        UserDefaults.standard.set(data, forKey: AgendaSnapshotStore.snapshotKey)
 
         guard WCSession.default.activationState == .activated else {
             return
         }
 
-        try? WCSession.default.updateApplicationContext([snapshotKey: data])
+        try? WCSession.default.updateApplicationContext([AgendaSnapshotStore.snapshotKey: data])
     }
 
     private func activateSessionIfNeeded() {

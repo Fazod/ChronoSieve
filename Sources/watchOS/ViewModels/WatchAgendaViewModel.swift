@@ -19,7 +19,6 @@ final class WatchAgendaViewModel: ObservableObject {
     @Published private(set) var events: [AgendaSnapshotEvent] = []
     @Published private(set) var generatedAt: Date?
 
-    private let snapshotKey = "agendaSnapshot"
     private var observer: NSObjectProtocol?
 
     init() {
@@ -45,10 +44,7 @@ final class WatchAgendaViewModel: ObservableObject {
     }
 
     func loadSnapshot() {
-        guard
-            let data = UserDefaults.standard.data(forKey: snapshotKey),
-            let snapshot = try? JSONDecoder().decode(AgendaSnapshot.self, from: data)
-        else {
+        guard let snapshot = AgendaSnapshotStore.load(preferSharedStore: true) else {
             if RuntimeEnvironment.usesMockCalendarData {
                 events = MockCalendarFixtures.events()
                     .map(AgendaSnapshotEvent.init(event:))
@@ -62,7 +58,7 @@ final class WatchAgendaViewModel: ObservableObject {
         }
 
         generatedAt = snapshot.generatedAt
-        events = snapshot.events.sorted(by: { $0.startDate < $1.startDate })
+        events = snapshot.events.sorted(by: AgendaSnapshotPlanner.sortEvents)
     }
 
     func events(for range: WatchRange, referenceDate: Date = Date()) -> [AgendaSnapshotEvent] {
