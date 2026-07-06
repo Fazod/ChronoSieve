@@ -42,6 +42,7 @@
 		CCA713C13822F9B61DD6E692 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06643D45E899BB335D56D0D9 /* CalendarSource.swift */; };
 		D383A299575A7C78F48A3AD2 /* WatchAgendaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4002C9D11D8A7C7EEEB8263 /* WatchAgendaViewModel.swift */; };
 		D7BE635DE4DE8AE83856DA20 /* ChronoSieveWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923ECAB7EE9D4AE34E30E747 /* ChronoSieveWatchApp.swift */; };
+		E21CA36CE7D6511DF65DE547 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 382225031E650F5A94C4E7F1 /* Assets.xcassets */; };
 		EDC90D262D044742BBAEFE4E /* WatchConnectivityReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B339B8A31B8464ED72C7B23 /* WatchConnectivityReceiver.swift */; };
 		F1F7D6663078C58CEA5EA185 /* ChronoSieveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64383037FF88A167D41F4873 /* ChronoSieveUITests.swift */; };
 /* End PBXBuildFile section */
@@ -106,6 +107,7 @@
 		06643D45E899BB335D56D0D9 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
 		1722AC20EA69B23926D7D7C6 /* ChronoSieveWatchExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChronoSieveWatchExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D94C580855B87D0F10A3498 /* ChronoSieveTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ChronoSieveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		382225031E650F5A94C4E7F1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3DC2D2A5A45D56565E0490C7 /* AgendaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaSnapshot.swift; sourceTree = "<group>"; };
 		461102F1338A74BB942C8FE3 /* AgendaViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgendaViewModelTests.swift; sourceTree = "<group>"; };
 		48BD99690E8710D99FBFF96D /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 		9CBCBA36C621DB74837B4C8B /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				382225031E650F5A94C4E7F1 /* Assets.xcassets */,
 				5766FB0D43AF8AC7363E7820 /* ChronoSieveApp.swift */,
 				5E20650E27082C3FE2610609 /* Persistence */,
 				1E0F912E33C7850165D3B6CF /* Services */,
@@ -360,6 +363,7 @@
 			buildConfigurationList = 72CE1B6B02085634D32E13B4 /* Build configuration list for PBXNativeTarget "ChronoSieve" */;
 			buildPhases = (
 				7D12CEC45B15134AC668CE7E /* Sources */,
+				232C1A09FC1DD313FFA312AE /* Resources */,
 				8A487B2AE859EC5F5745708D /* Embed Watch Content */,
 			);
 			buildRules = (
@@ -464,6 +468,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		232C1A09FC1DD313FFA312AE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21CA36CE7D6511DF65DE547 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1400B26CDFF21F023E095C0C /* Sources */ = {
